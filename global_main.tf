@@ -1,5 +1,5 @@
-module "vpc" {
-  source = "./modules/vpc"
+module "network" {
+  source = "./modules/network"
 }
 
 module "web_app" {

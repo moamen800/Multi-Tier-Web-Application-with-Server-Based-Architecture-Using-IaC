@@ -9,3 +9,5 @@ terraform.tfvars
 
 # Terraform lock file (optional, if you don't want to push it)
 .terraform.lock.hcl
+
+FolderStructure_ serverbased.txt
