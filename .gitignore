@@ -1,0 +1,11 @@
+# Terraform files
+*.tfstate
+*.tfstate.*
+*.backup
+.terraform/
+
+# Local variables file
+terraform.tfvars
+
+# Terraform lock file (optional, if you don't want to push it)
+.terraform.lock.hcl
