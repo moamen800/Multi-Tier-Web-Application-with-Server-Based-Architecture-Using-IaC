@@ -4,15 +4,14 @@
 # VPC name
 variable "vpc_name" {
   description = "The name of the VPC"
-  default     = "multi-tier-vpc"
+  default     = "multi-tier-vpc" # Default name for the VPC
 }
 
 # CIDR block for the VPC
 variable "vpc_cidr" {
   description = "CIDR block for the VPC"
-  default     = "10.0.0.0/16"
+  default     = "10.0.0.0/16" # IP range for the VPC, allowing up to 65536 IP addresses
 }
-
 
 # Public subnets with their availability zones and IP ranges
 variable "public_subnets" {
