@@ -53,14 +53,14 @@ resource "aws_lb_target_group" "web_app_target_group" {
 # Launch Template using the dynamically fetched image_id
 resource "aws_launch_template" "web_app_launch_template" {
   name_prefix   = "web-app"                             # Prefix for the launch template name
-  image_id      = data.aws_ami.latest_amazon_linux_2.id # Use the dynamically fetched Amazon Linux 2 AMI ID
+  image_id      = var.image_id                          # Use the dynamically fetched Amazon Linux 2 AMI ID
   instance_type = "t2.micro"                            # Instance type for the web app (can be changed as needed)
 }
 
 ####################################### Auto Scaling Group #######################################
 # Auto Scaling Group for the Web App, using the launch template
 resource "aws_autoscaling_group" "web_app_asg" {
-  availability_zones = data.aws_availability_zones.available.names # Use available AZs dynamically fetched
+  availability_zones = var.availability_zones                      # Use available AZs dynamically fetched
   desired_capacity   = 1                                           # Desired number of instances
   max_size           = 1                                           # Maximum number of instances
   min_size           = 1                                           # Minimum number of instances

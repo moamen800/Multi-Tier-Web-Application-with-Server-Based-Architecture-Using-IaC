@@ -23,3 +23,13 @@ variable "web_sg_id" {
   description = "The ID of the web security group for instances"
   type        = string # A string type to hold the security group ID for the EC2 instances
 }
+
+variable "image_id" {
+  description = "The AMI ID to use for the instances"
+  type        = string
+}
+
+variable "availability_zones" {
+  description = "The available availability zones in the region"
+  type        = list(string)
+}

@@ -2,13 +2,11 @@ aws-architecture_serverbased/
 ├── main.tf
 ├── variables.tf
 ├── outputs.tf
+├── data-sources.tf
 ├── terraform.tfvars
 ├── modules/
 │   ├── network/
-│   │   ├── internet_gateway.tf
-│   │   ├── nat_gateway.tf
-│   │   ├── subnets.tf
-│   │   ├── vpc.tf
+│   │   ├── main.tf
 │   │   ├── variables.tf
 │   │   └── outputs.tf
 │   ├── web_app/
