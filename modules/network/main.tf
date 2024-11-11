@@ -88,6 +88,46 @@ resource "aws_route_table_association" "private_subnet_assoc" {
   route_table_id = aws_route_table.private_rt.id
 }
 
+####################################### Create App NACL #######################################
+resource "aws_network_acl" "app_nacl" {
+  vpc_id = aws_vpc.vpc.id # Reference the VPC
+
+  tags = {
+    Name = "app-nacl"
+  }
+}
+
+# Inbound Rule for App NACL (Allow all traffic from 10.0.0.0/16)
+resource "aws_network_acl_rule" "app_nacl_inbound" {
+  network_acl_id = aws_network_acl.app_nacl.id
+  rule_number    = 100
+  protocol       = "tcp"
+  rule_action    = "allow"
+  cidr_block     = var.vpc_cidr
+  from_port      = 0
+  to_port        = 65535
+  egress         = false
+}
+
+# Outbound Rule for App NACL (Allow all traffic to 10.0.0.0/16)
+resource "aws_network_acl_rule" "app_nacl_outbound" {
+  network_acl_id = aws_network_acl.app_nacl.id
+  rule_number    = 110
+  protocol       = "tcp"
+  rule_action    = "allow"
+  cidr_block     = var.vpc_cidr
+  from_port      = 0
+  to_port        = 65535
+  egress         = true
+}
+
+# Associate the NACL with Private Subnets
+resource "aws_network_acl_association" "app_nacl_assoc" {
+  for_each       = aws_subnet.private_subnets # Iterate over both private subnets
+  subnet_id      = each.value.id
+  network_acl_id = aws_network_acl.app_nacl.id # Associate the app NACL with private subnets
+}
+
 ####################################### Internet Gateway #######################################
 # Create an Internet Gateway to provide public subnets with internet access
 resource "aws_internet_gateway" "internet_gateway" {

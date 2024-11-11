@@ -1,7 +1,7 @@
 aws-architecture_serverbased/
-├── main.tf
-├── variables.tf
-├── outputs.tf
+├── global_main.tf 
+├── global_variables.tf
+├── global_outputs.tf
 ├── data-sources.tf
 ├── terraform.tfvars
 ├── modules/
@@ -21,8 +21,12 @@ aws-architecture_serverbased/
 │   │   ├── main.tf
 │   │   ├── variables.tf
 │   │   └── outputs.tf
-│   └── security_groups/
-│       ├── main.tf
-│       ├── variables.tf
-│       └── outputs.tf
+│   ├── security_groups/
+│   │   ├── main.tf
+│   │   ├── variables.tf
+│   │   └── outputs.tf
+│   ├── edge_layer/           
+│   │   ├── main.tf
+│   │   ├── variables.tf
+│   │   └── outputs.tf
 └── .gitignore

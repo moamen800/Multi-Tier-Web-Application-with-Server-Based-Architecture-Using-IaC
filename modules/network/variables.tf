@@ -4,7 +4,7 @@
 # VPC name
 variable "vpc_name" {
   description = "The name of the VPC"
-  default     = "multi-tier-vpc" # Default name for the VPC
+  default     = "multi-tier-vpc" 
 }
 
 # CIDR block for the VPC

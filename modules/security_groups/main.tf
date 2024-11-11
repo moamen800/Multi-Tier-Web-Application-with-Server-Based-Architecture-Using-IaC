@@ -1,6 +1,7 @@
 ####################################### ALB Security Group (web_alb_sg) #######################################
 # Security group for the Application Load Balancer (ALB)
 resource "aws_security_group" "web_alb_sg" {
+  name   = "web_alb_sg"
   vpc_id = var.vpc_id # Associate the security group with the specified VPC
 
   # HTTP Ingress (Port 80) – Allow incoming HTTP traffic to the ALB
@@ -12,12 +13,12 @@ resource "aws_security_group" "web_alb_sg" {
   }
 
   # HTTPS Ingress (Port 443) – Allow incoming HTTPS traffic to the ALB
-  ingress {
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"] # Allow traffic from anywhere (0.0.0.0/0)
-  }
+  # ingress {
+  #   from_port   = 443
+  #   to_port     = 443
+  #   protocol    = "tcp"
+  #   cidr_blocks = ["0.0.0.0/0"] # Allow traffic from anywhere (0.0.0.0/0)
+  # }
 
   tags = {
     Name = "web-alb-sg" # Tag for identifying the ALB security group
@@ -27,9 +28,9 @@ resource "aws_security_group" "web_alb_sg" {
 ####################################### Web Security Group (web_sg) #######################################
 # Security group for the web instances behind the ALB
 resource "aws_security_group" "web_sg" {
-  vpc_id = var.vpc_id # Associate the security group with the specified VPC
+  name   = "web_sg"
+  vpc_id = var.vpc_id
 
-  # Allow HTTP from ALB (Port 80) – Only ALB can send HTTP traffic to web instances
   ingress {
     from_port       = 80
     to_port         = 80
@@ -37,13 +38,12 @@ resource "aws_security_group" "web_sg" {
     security_groups = [aws_security_group.web_alb_sg.id] # Allow traffic from the ALB security group
   }
 
-  # Allow HTTPS from ALB (Port 443) – Only ALB can send HTTPS traffic to web instances
-  ingress {
-    from_port       = 443
-    to_port         = 443
-    protocol        = "tcp"
-    security_groups = [aws_security_group.web_alb_sg.id] # Allow traffic from the ALB security group
-  }
+  # ingress {
+  #   from_port       = 443
+  #   to_port         = 443
+  #   protocol        = "tcp"
+  #   security_groups = [aws_security_group.web_alb_sg.id] # Allow traffic from the ALB security group
+  # }
 
   # Allow SSH (Port 22) – Use with caution, allows SSH access from anywhere
   ingress {
@@ -54,52 +54,37 @@ resource "aws_security_group" "web_sg" {
   }
 
   tags = {
-    Name = "web-sg" # Tag for identifying the web instance security group
+    Name = "web-sg"
   }
 }
+
 ####################################### ALB Security Group (app_alb_sg) #######################################
 # Security group for the Application Load Balancer (ALB)
 resource "aws_security_group" "app_alb_sg" {
-  vpc_id = var.vpc_id # Associate the security group with the specified VPC
+  name   = "app-alb-sg"
+  vpc_id = var.vpc_id
 
-  # HTTP Ingress (Port 80) – Allow incoming HTTP traffic to the ALB from web_sg and web_alb_sg Security Groups
   ingress {
-    from_port       = 80
-    to_port         = 80
-    protocol        = "tcp"
-    security_groups = [aws_security_group.web_sg.id] # Allow traffic from the web_sg and web_alb_sg Security Groups
-  }
-
-  # HTTPS Ingress (Port 443) – Allow incoming HTTPS traffic to the ALB from web_sg and web_alb_sg Security Groups
-  ingress {
-    from_port       = 443
-    to_port         = 443
+    from_port       = 8080
+    to_port         = 8080
     protocol        = "tcp"
     security_groups = [aws_security_group.web_sg.id] # Allow traffic from the web_sg and web_alb_sg Security Groups
   }
 
   tags = {
-    Name = "app-alb-sg" # Tag for identifying the Application Load Balancer security group
+    Name = "app-alb-sg"
   }
 }
 
 ####################################### app Security Group (app_sg) #######################################
 # Security group for the app instances behind the Application Load Balancer
 resource "aws_security_group" "app_sg" {
-  vpc_id = var.vpc_id # Associate the security group with the specified VPC
+  name   = "app-sg"
+  vpc_id = var.vpc_id
 
-  # Allow HTTP from ALB (Port 80) – Only the ALB can send HTTP traffic to the app instances
   ingress {
-    from_port       = 80
-    to_port         = 80
-    protocol        = "tcp"
-    security_groups = [aws_security_group.app_alb_sg.id] # Allow traffic from the app_alb_sg security group
-  }
-
-  # Allow HTTPS from ALB (Port 443) – Only the ALB can send HTTPS traffic to the web instances
-  ingress {
-    from_port       = 443
-    to_port         = 443
+    from_port       = 8080
+    to_port         = 8080
     protocol        = "tcp"
     security_groups = [aws_security_group.app_alb_sg.id] # Allow traffic from the app_alb_sg security group
   }
@@ -113,6 +98,24 @@ resource "aws_security_group" "app_sg" {
   }
 
   tags = {
-    Name = "app-sg" # Tag for identifying the web instance security group
+    Name = "app-sg"
+  }
+}
+
+####################################### database Security Group (db_sg) #######################################
+resource "aws_security_group" "db_sg" {
+  name        = "db-sg"
+  description = "Allow access to RDS DB"
+  vpc_id      = var.vpc_id
+
+  ingress {
+    from_port       = 5432
+    to_port         = 5432
+    protocol        = "tcp"
+    security_groups = [aws_security_group.app_sg.id] # Allow traffic from the app_sg security group
+  }
+
+  tags = {
+    Name = "db-sg"
   }
 }
