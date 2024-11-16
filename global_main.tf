@@ -1,3 +1,11 @@
+####################################### edge Module #######################################
+module "edge_layer" {
+  source               = "./modules/edge_layer"
+  aws_region           = var.aws_region
+  web_app_alb_dns_name = module.web_app.web_app_alb_dns_name
+  web_app_alb_id       = module.web_app.web_app_alb_id
+}
+
 ####################################### Network Module #######################################
 module "network" {
   source = "./modules/network"

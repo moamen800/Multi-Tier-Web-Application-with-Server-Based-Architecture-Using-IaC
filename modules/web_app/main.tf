@@ -61,9 +61,9 @@ resource "aws_launch_template" "web_app_launch_template" {
 # Auto Scaling Group for the Web App, using the launch template
 resource "aws_autoscaling_group" "web_app_asg" {
   availability_zones = var.availability_zones # Use available AZs dynamically fetched
-  desired_capacity   = 1                      # Desired number of instances
-  max_size           = 1                      # Maximum number of instances
-  min_size           = 1                      # Minimum number of instances
+  desired_capacity   = 0                      # Desired number of instances
+  max_size           = 0                      # Maximum number of instances
+  min_size           = 0                      # Minimum number of instances
 
   launch_template {
     id      = aws_launch_template.web_app_launch_template.id # Reference the launch template ID
