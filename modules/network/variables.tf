@@ -4,7 +4,7 @@
 # VPC name
 variable "vpc_name" {
   description = "The name of the VPC"
-  default     = "multi-tier-vpc" 
+  default     = "multi-tier-vpc"
 }
 
 # CIDR block for the VPC
@@ -14,7 +14,7 @@ variable "vpc_cidr" {
 }
 
 # Public subnets with their availability zones and IP ranges
-variable "public_subnets" {
+variable "public_subnets_web" {
   description = "Map of public subnets by availability zone"
   default = {
     "us-east-1a" = "10.0.1.0/24" # Public subnet 1 in us-east-1a
@@ -23,7 +23,7 @@ variable "public_subnets" {
 }
 
 # Private subnets with their availability zones and IP ranges
-variable "private_subnets" {
+variable "public_subnets_app" {
   description = "Map of private subnets by availability zone"
   default = {
     "us-east-1a" = "10.0.100.0/24" # Private subnet 1 in us-east-1a

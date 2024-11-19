@@ -9,24 +9,65 @@ resource "aws_vpc" "vpc" {
   }
 }
 
-####################################### Public Subnets #######################################
+####################################### Public Subnets WEB #######################################
 # Create public subnets across availability zones
-resource "aws_subnet" "public_subnets" {
-  for_each                = var.public_subnets # Create one subnet per AZ
+resource "aws_subnet" "public_subnets_web" {
+  for_each                = var.public_subnets_web # Create one subnet per AZ
   vpc_id                  = aws_vpc.vpc.id     # Associate with the VPC
   cidr_block              = each.value         # Assign IP range from the map
   map_public_ip_on_launch = true               # Assign public IP to instances
   availability_zone       = each.key           # Set AZ for each subnet
 
   tags = {
-    Name      = "${each.key}_public_subnet" # Name tag with AZ
+    Name      = "${each.key}_public_subnet_web" # Name tag with AZ
     Terraform = "true"
   }
 }
 
 ####################################### Public Route Table #######################################
 # Create a public route table to route traffic through the Internet Gateway
-resource "aws_route_table" "public_rt" {
+resource "aws_route_table" "public_rt_web" {
+  vpc_id = aws_vpc.vpc.id # Reference the VPC for the route table
+
+  tags = {
+    Name      = "public_route_table"
+    Terraform = "true"
+  }
+}
+
+# Add a default route to the Internet Gateway for the public route table
+resource "aws_route" "public_internet_access_web" {
+  route_table_id         = aws_route_table.public_rt_web.id
+  destination_cidr_block = "0.0.0.0/0" # Route all traffic to the IGW
+  gateway_id             = aws_internet_gateway.internet_gateway.id
+}
+
+# Associate public subnets with the public route table
+resource "aws_route_table_association" "public_subnet_assoc" {
+  for_each       = aws_subnet.public_subnets_web # Iterate over public subnets
+  subnet_id      = each.value.id
+  route_table_id = aws_route_table.public_rt_web.id
+}
+
+
+####################################### Public Subnets APP #######################################
+# Create public subnets across availability zones
+resource "aws_subnet" "public_subnets_app" {
+  for_each                = var.public_subnets_app # Create one subnet per AZ
+  vpc_id                  = aws_vpc.vpc.id     # Associate with the VPC
+  cidr_block              = each.value         # Assign IP range from the map
+  map_public_ip_on_launch = true               # Assign public IP to instances
+  availability_zone       = each.key           # Set AZ for each subnet
+
+  tags = {
+    Name      = "${each.key}_public_subnet_app" # Name tag with AZ
+    Terraform = "true"
+  }
+}
+
+####################################### Public Route Table #######################################
+# Create a public route table to route traffic through the Internet Gateway
+resource "aws_route_table" "public_rt_app" {
   vpc_id = aws_vpc.vpc.id # Reference the VPC for the route table
 
   tags = {
@@ -37,96 +78,57 @@ resource "aws_route_table" "public_rt" {
 
 # Add a default route to the Internet Gateway for the public route table
 resource "aws_route" "public_internet_access" {
-  route_table_id         = aws_route_table.public_rt.id
+  route_table_id         = aws_route_table.public_rt_app.id
   destination_cidr_block = "0.0.0.0/0" # Route all traffic to the IGW
   gateway_id             = aws_internet_gateway.internet_gateway.id
 }
 
 # Associate public subnets with the public route table
-resource "aws_route_table_association" "public_subnet_assoc" {
-  for_each       = aws_subnet.public_subnets # Iterate over public subnets
+resource "aws_route_table_association" "public_subnet_assoc_app" {
+  for_each       = aws_subnet.public_subnets_app # Iterate over public subnets
   subnet_id      = each.value.id
-  route_table_id = aws_route_table.public_rt.id
-}
-
-####################################### Private Subnets #######################################
-# Create private subnets across availability zones
-resource "aws_subnet" "private_subnets" {
-  for_each          = var.private_subnets # Create one subnet per AZ
-  vpc_id            = aws_vpc.vpc.id      # Associate with the VPC
-  cidr_block        = each.value          # Assign IP range from the map
-  availability_zone = each.key            # Set AZ for the subnet
-
-  tags = {
-    Name      = "${each.key}_private_subnet" # Name tag with AZ
-    Terraform = "true"
-  }
-}
-
-####################################### Private Route Table #######################################
-# Create a private route table for internal traffic and NAT Gateway access
-resource "aws_route_table" "private_rt" {
-  vpc_id = aws_vpc.vpc.id # Reference the VPC for the route table
-
-  tags = {
-    Name      = "private_route_table"
-    Terraform = "true"
-  }
-}
-
-# Route outbound traffic from private subnets to the NAT Gateway
-resource "aws_route" "private_nat_access" {
-  route_table_id         = aws_route_table.private_rt.id
-  destination_cidr_block = "0.0.0.0/0" # Route all outbound traffic to the NAT Gateway
-  nat_gateway_id         = aws_nat_gateway.nat_gateway.id
-}
-
-# Associate private subnets with the private route table
-resource "aws_route_table_association" "private_subnet_assoc" {
-  for_each       = aws_subnet.private_subnets # Iterate over private subnets
-  subnet_id      = each.value.id
-  route_table_id = aws_route_table.private_rt.id
+  route_table_id = aws_route_table.public_rt_app.id
 }
 
 ####################################### Create App NACL #######################################
-resource "aws_network_acl" "app_nacl" {
-  vpc_id = aws_vpc.vpc.id # Reference the VPC
+# resource "aws_network_acl" "app_nacl" {
+#   vpc_id = aws_vpc.vpc.id # Reference the VPC
 
-  tags = {
-    Name = "app-nacl"
-  }
-}
+#   tags = {
+#     Name = "app-nacl"
+#   }
+# }
 
 # Inbound Rule for App NACL (Allow all traffic from 10.0.0.0/16)
-resource "aws_network_acl_rule" "app_nacl_inbound" {
-  network_acl_id = aws_network_acl.app_nacl.id
-  rule_number    = 100
-  protocol       = "tcp"
-  rule_action    = "allow"
-  cidr_block     = var.vpc_cidr
-  from_port      = 0
-  to_port        = 65535
-  egress         = false
-}
+# resource "aws_network_acl_rule" "app_nacl_inbound" {
+#   network_acl_id = aws_network_acl.app_nacl.id
+#   rule_number    = 100
+#   protocol       = "tcp"
+#   rule_action    = "allow"
+#   cidr_block     = var.vpc_cidr
+#   from_port      = 0
+#   to_port        = 65535
+#   egress         = false
+# }
 
-# Outbound Rule for App NACL (Allow all traffic to 10.0.0.0/16)
-resource "aws_network_acl_rule" "app_nacl_outbound" {
-  network_acl_id = aws_network_acl.app_nacl.id
-  rule_number    = 110
-  protocol       = "tcp"
-  rule_action    = "allow"
-  cidr_block     = var.vpc_cidr
-  from_port      = 0
-  to_port        = 65535
-  egress         = true
-}
+# # Outbound Rule for App NACL (Allow all traffic to 10.0.0.0/16)
+# resource "aws_network_acl_rule" "app_nacl_outbound" {
+#   network_acl_id = aws_network_acl.app_nacl.id
+#   rule_number    = 110
+#   protocol       = "tcp"
+#   rule_action    = "allow"
+#   cidr_block     = "0.0.0.0/0"
+#   from_port      = 0
+#   to_port        = 65535
+#   egress         = true
+# }
 
 # Associate the NACL with Private Subnets
-resource "aws_network_acl_association" "app_nacl_assoc" {
-  for_each       = aws_subnet.private_subnets # Iterate over both private subnets
-  subnet_id      = each.value.id
-  network_acl_id = aws_network_acl.app_nacl.id # Associate the app NACL with private subnets
-}
+# resource "aws_network_acl_association" "app_nacl_assoc" {
+#   for_each       = aws_subnet.private_subnets # Iterate over both private subnets
+#   subnet_id      = each.value.id
+#   network_acl_id = aws_network_acl.app_nacl.id # Associate the app NACL with private subnets
+# }
 
 ####################################### Internet Gateway #######################################
 # Create an Internet Gateway to provide public subnets with internet access
@@ -135,25 +137,5 @@ resource "aws_internet_gateway" "internet_gateway" {
 
   tags = {
     Name = "igw"
-  }
-}
-
-####################################### NAT Gateway #######################################
-# Allocate an Elastic IP (EIP) for the NAT Gateway
-resource "aws_eip" "nat_gateway_eip" {
-  domain = "vpc" # Allocate EIP within the VPC
-
-  tags = {
-    Name = "nat_gateway_eip"
-  }
-}
-
-# Create a NAT Gateway to enable internet access for private subnets
-resource "aws_nat_gateway" "nat_gateway" {
-  allocation_id = aws_eip.nat_gateway_eip.id                 # Use the allocated EIP
-  subnet_id     = aws_subnet.public_subnets["us-east-1a"].id # Attach to a public subnet
-
-  tags = {
-    Name = "nat_gateway"
   }
 }

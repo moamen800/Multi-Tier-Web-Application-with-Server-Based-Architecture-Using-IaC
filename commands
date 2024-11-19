@@ -1,0 +1,6 @@
+sudo netstat -tulpn | grep 3000
+sudo apt install net-tools
+curl -g "http://[::1]:3000/" -- --host "::"
+sudo pm2 logs
+sudo pm2 logs 0
+sudo pm2 stop 0

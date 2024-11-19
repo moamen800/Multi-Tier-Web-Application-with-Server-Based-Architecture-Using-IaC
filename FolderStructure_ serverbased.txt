@@ -12,11 +12,13 @@ aws-architecture_serverbased/
 │   ├── web_app/
 │   │   ├── main.tf
 │   │   ├── variables.tf
-│   │   └── outputs.tf
+│   │   ├── outputs.tf
+│   │   └── frontend.sh
 │   ├── application_servers/
 │   │   ├── main.tf
 │   │   ├── variables.tf
-│   │   └── outputs.tf
+│   │   ├── outputs.tf
+│   │   └── backend.sh
 │   ├── database/
 │   │   ├── main.tf
 │   │   ├── variables.tf

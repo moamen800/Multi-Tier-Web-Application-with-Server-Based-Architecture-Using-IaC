@@ -7,7 +7,7 @@ variable "vpc_id" {
 }
 
 # List of Public Subnet IDs where the Application Load Balancer and other resources will reside
-variable "public_subnet_ids" {
+variable "public_subnet_web_ids" {
   description = "List of Public Subnet IDs"
   type        = list(string) # A list of strings to hold multiple subnet IDs
 }
@@ -29,7 +29,7 @@ variable "image_id" {
   type        = string
 }
 
-variable "availability_zones" {
-  description = "The available availability zones in the region"
-  type        = list(string)
+variable "vpc_cidr" {
+  description = "the cidr of the vpc"
+  type        = string
 }

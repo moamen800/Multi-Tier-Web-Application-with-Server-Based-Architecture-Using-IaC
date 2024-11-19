@@ -1,6 +1,6 @@
 ####################################### RDS Database Instance #######################################
 # RDS Database Instance resource for PostgreSQL
-resource "aws_db_instance" "rds" {
+resource "aws_db_instance" "rds-db" {
   allocated_storage    = 5                    # Database storage in GB
   db_name              = var.db_name          # Name of the database
   engine               = "postgres"           # Database engine type (PostgreSQL)
@@ -20,10 +20,14 @@ resource "aws_db_instance" "rds" {
   db_subnet_group_name   = aws_db_subnet_group.subnet_group.name # DB subnet group for placing the RDS instance in private subnets
 }
 
+
 ####################################### Custom Subnet Group for RDS #######################################
 # Custom subnet group for placing the RDS instance in specific subnets
-resource "aws_db_subnet_group" "subnet_group" {
+resource "aws_db_subnet_group" "db_subnet_group" {
   name        = "db-subnet-group"      # Name for the custom DB subnet group
   subnet_ids  = var.private_subnet_ids # List of private subnet IDs where the RDS instance will be placed
   description = "RDS Subnet Group"     # Description for the subnet group
+  tags = {
+    name = "db_subnet_group"
+  }
 }
