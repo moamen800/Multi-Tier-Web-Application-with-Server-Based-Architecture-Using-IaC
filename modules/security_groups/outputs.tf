@@ -19,7 +19,7 @@ output "app_sg_id" {
   value       = aws_security_group.app_sg.id
 }
 
-# output "db_sg_id" {
-#   description = "The ID of the web security group for instances"
-#   value       = aws_security_group.db_sg.id
-# }
+output "MongoDB_sg_id" {
+  description = "The ID of the web security group for instances"
+  value       = aws_security_group.MongoDB_sg.id
+}

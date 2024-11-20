@@ -33,7 +33,8 @@ resource "aws_security_group" "web_sg" {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    security_groups = [aws_security_group.web_alb_sg.id]
+    cidr_blocks = ["0.0.0.0/0"]
+    # security_groups = [aws_security_group.web_alb_sg.id]
   }
 
   # Allow SSH (Port 22) – Use with caution, allows SSH access from anywhere
@@ -92,8 +93,9 @@ resource "aws_security_group" "app_sg" {
     from_port   = 3000
     to_port     = 3000
     protocol    = "tcp"
-    security_groups = [aws_security_group.app_alb_sg.id]
-    
+    cidr_blocks = ["0.0.0.0/0"]
+    # security_groups = [aws_security_group.app_alb_sg.id]
+
   }
 
   # Allow SSH (Port 22) – Use with caution, allows SSH access from anywhere
@@ -118,28 +120,28 @@ resource "aws_security_group" "app_sg" {
 }
 
 ####################################### database Security Group (db_sg) #######################################
-# resource "aws_security_group" "db_sg" {
-#   name        = "db-sg"
-#   description = "Allow access to RDS DB"
-#   vpc_id      = var.vpc_id
+resource "aws_security_group" "MongoDB_sg" {
+  name        = "MongoDB_sg"
+  description = "Allow access to MONGO DB"
+  vpc_id      = var.vpc_id
 
-#   ingress {
-#     from_port   = 3306
-#     to_port     = 3306
-#     protocol    = "tcp"
-#     cidr_blocks = ["0.0.0.0/0"]
-#     # security_groups = [aws_security_group.app_sg.id]
-#   }
+  ingress {
+    from_port   = 27017
+    to_port     = 27017
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    # security_groups = [aws_security_group.app_sg.id]
+  }
 
-#   # Outbound rule – Allow all outbound traffic
-#   egress {
-#     from_port   = 0
-#     to_port     = 0
-#     protocol    = "-1" # -1 allows all traffic
-#     cidr_blocks = ["0.0.0.0/0"]
-#   }
+  # Outbound rule – Allow all outbound traffic
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1" # -1 allows all traffic
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 
-#   tags = {
-#     Name = "db-sg"
-#   }
-# }
+  tags = {
+    Name = "MongoDB_sg"
+  }
+}

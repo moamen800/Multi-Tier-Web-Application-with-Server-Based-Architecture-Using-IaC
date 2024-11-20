@@ -61,7 +61,7 @@ resource "aws_launch_template" "web_app_launch_template" {
   key_name               = "keypair"       # Replace with your key pair name 
   user_data              = filebase64(("${path.module}/frontend.sh"))
   iam_instance_profile {
-    name = aws_iam_instance_profile.web_app_instance_profile.name
+    name = aws_iam_instance_profile.web_instance_profile.name
   }
 }
 
@@ -93,8 +93,8 @@ resource "aws_autoscaling_group" "web_app_asg" {
 ####################################### IAM Roles and Policies #######################################
 
 # IAM Role for EC2 instances
-resource "aws_iam_role" "web_app_role" {
-  name = "web-app-role"
+resource "aws_iam_role" "web_role" {
+  name = "web-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
@@ -111,13 +111,13 @@ resource "aws_iam_role" "web_app_role" {
 }
 
 # Attach IAM policy to the role
-resource "aws_iam_role_policy_attachment" "web_app_role_policy" {
-  role       = aws_iam_role.web_app_role.name
+resource "aws_iam_role_policy_attachment" "web_role_policy" {
+  role       = aws_iam_role.web_role.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess"
 }
 
 # IAM Instance Profile
-resource "aws_iam_instance_profile" "web_app_instance_profile" {
-  name = "web-app-instance-profile"
-  role = aws_iam_role.web_app_role.name
+resource "aws_iam_instance_profile" "web_instance_profile" {
+  name = "web-instance-profile"
+  role = aws_iam_role.web_role.name
 }

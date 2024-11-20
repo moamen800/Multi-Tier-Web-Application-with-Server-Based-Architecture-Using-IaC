@@ -29,7 +29,7 @@ variable "image_id" {
   type        = string
 }
 
-# variable "availability_zones" {
-#   description = "The available availability zones in the region"
-#   type        = list(string)
-# }
+variable "MongoDB_sg_id" {
+  description = "The ID of the web security group for instances"
+  type        = string
+}

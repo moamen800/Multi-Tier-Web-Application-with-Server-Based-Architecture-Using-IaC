@@ -1,8 +1,9 @@
 ####################################### VPC #######################################
 # Create the VPC with a defined CIDR block (IP range)
 resource "aws_vpc" "vpc" {
-  cidr_block = var.vpc_cidr # Set the IP range for the VPC
-
+  cidr_block           = var.vpc_cidr # Set the IP range for the VPC
+  enable_dns_support   = true         # Enable DNS support in the VPC
+  enable_dns_hostnames = true         # Enable DNS hostnames in the VPC for resolving addresses
   tags = {
     Name      = var.vpc_name # Name tag for VPC
     Terraform = "true"       # Indicate resource managed by Terraform
@@ -13,10 +14,10 @@ resource "aws_vpc" "vpc" {
 # Create public subnets across availability zones
 resource "aws_subnet" "public_subnets_web" {
   for_each                = var.public_subnets_web # Create one subnet per AZ
-  vpc_id                  = aws_vpc.vpc.id     # Associate with the VPC
-  cidr_block              = each.value         # Assign IP range from the map
-  map_public_ip_on_launch = true               # Assign public IP to instances
-  availability_zone       = each.key           # Set AZ for each subnet
+  vpc_id                  = aws_vpc.vpc.id         # Associate with the VPC
+  cidr_block              = each.value             # Assign IP range from the map
+  map_public_ip_on_launch = true                   # Assign public IP to instances
+  availability_zone       = each.key               # Set AZ for each subnet
 
   tags = {
     Name      = "${each.key}_public_subnet_web" # Name tag with AZ
@@ -54,10 +55,10 @@ resource "aws_route_table_association" "public_subnet_assoc" {
 # Create public subnets across availability zones
 resource "aws_subnet" "public_subnets_app" {
   for_each                = var.public_subnets_app # Create one subnet per AZ
-  vpc_id                  = aws_vpc.vpc.id     # Associate with the VPC
-  cidr_block              = each.value         # Assign IP range from the map
-  map_public_ip_on_launch = true               # Assign public IP to instances
-  availability_zone       = each.key           # Set AZ for each subnet
+  vpc_id                  = aws_vpc.vpc.id         # Associate with the VPC
+  cidr_block              = each.value             # Assign IP range from the map
+  map_public_ip_on_launch = true                   # Assign public IP to instances
+  availability_zone       = each.key               # Set AZ for each subnet
 
   tags = {
     Name      = "${each.key}_public_subnet_app" # Name tag with AZ

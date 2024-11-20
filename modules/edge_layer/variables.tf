@@ -13,14 +13,14 @@ variable "aws_region" {
 ####################################### CloudFront Variable #######################################
 variable "web_app_alb_dns_name" {
   description = "dns of the web_app_alb"
-  type = string
+  type        = string
 }
 
 ####################################### WAF Variable #######################################
 variable "web_app_alb_id" {
   description = "dns of the web_app_alb"
-  type = string
-} 
+  type        = string
+}
 
 
 ####################################### Cognito Variable #######################################
