@@ -1,13 +1,38 @@
-# Terraform files
+# Terraform State Files
+# These files store the state of your infrastructure.
 *.tfstate
 *.tfstate.*
 *.backup
 .terraform/
 
-# Local variables file
+# Local Variables File
+# This file contains sensitive or environment-specific data.
 terraform.tfvars
 
-# Terraform lock file (optional, if you don't want to push it)
+# Terraform Lock File (Optional)
+# Lock file to ensure consistent versions of providers and modules.
 .terraform.lock.hcl
 
-FolderStructure_ serverbased.txt
+# Folder Structure Documentation
+# A text file detailing the folder structure of your project.
+FolderStructure_serverbased.txt
+
+# Key Pair
+# PEM file for your key pair, used for SSH or other secure connections.
+keypair.pem
+
+# Scripts File
+# Text file containing custom scripts for your project.
+scripts.txt
+
+# Simple MERN App Archive
+# A ZIP file containing your Simple MERN application.
+Simple-MERN-App.zip
+
+# HTML File
+# An index HTML file for your web application or project.
+index1.html
+
+# Commands
+# File containing various commands used for your Terraform project or server setup.
+commands

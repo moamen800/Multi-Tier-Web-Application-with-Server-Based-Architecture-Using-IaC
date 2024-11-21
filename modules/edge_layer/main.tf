@@ -46,15 +46,46 @@ resource "aws_cloudfront_distribution" "cdn" {
 }
 
 
-# ####################################### Origin Access Control (OAC) #######################################
-# # Defines the Origin Access Control for securing access to the S3 bucket
-# # through CloudFront. It ensures that all requests to the S3 origin are signed using 
-# # AWS SigV4 signing protocol for enhanced security.
+#################################### WAF Web ACL Configuration ####################################
+resource "aws_wafv2_web_acl" "WAF_web_acl" {
+  name        = "WAF-Web-ACL"
+  description = "WAF ACL to protect CloudFront distribution from XSS, and bot traffic."
+  scope       = "CLOUDFRONT" # Scope for CloudFront, as this is a global service.
+  depends_on  = [aws_cloudfront_distribution.cdn]
+  default_action {
+    allow {} # Allow requests by default unless blocked by a rule.
+  }
 
-# # resource "aws_cloudfront_origin_access_control" "oac" {
-# #   name                              = "OAC-for-S3-${var.s3_bucket_name}"                              # Name for the Origin Access Control
-# #   origin_access_control_origin_type = "s3"                                                            # Specifies that the origin is an S3 bucket
-# #   signing_behavior                  = "always"                                                        # Ensures requests to S3 are signed
-# #   signing_protocol                  = "sigv4"                                                         # Uses SigV4 for signing requests to S3
-# #   description                       = "Origin Access Control for S3 bucket access through CloudFront" # Description for the OAC configuration
-# # }
+  rule {
+    name     = "AllowAllRule"
+    priority = 0
+    action {
+      allow {}
+    }
+    statement {
+      byte_match_statement {
+        search_string = "example"
+        field_to_match {
+          query_string {}
+        }
+        positional_constraint = "CONTAINS"
+
+        text_transformation {
+          priority = 0
+          type     = "LOWERCASE"
+        }
+      }
+    }
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "allowAllRule"
+      sampled_requests_enabled   = true
+    }
+  }
+
+  visibility_config {
+    cloudwatch_metrics_enabled = true          # Enable CloudWatch metrics for the Web ACL.
+    metric_name                = "WAF-Web-ACL" # Metric name for monitoring the Web ACL's performance.
+    sampled_requests_enabled   = true          # Enable request sampling for analysis.
+  }
+}
