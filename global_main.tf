@@ -1,10 +1,10 @@
 ####################################### edge Module #######################################
-# module "edge_layer" {
-#   source               = "./modules/edge_layer"
-#   aws_region           = var.aws_region
-#   web_app_alb_dns_name = module.web_app.web_app_alb_dns_name
-#   web_app_alb_id       = module.web_app.web_app_alb_id
-# }
+module "edge_layer" {
+  source           = "./modules/edge_layer"
+  aws_region       = var.aws_region
+  web_alb_dns_name = module.web_app.web_alb_dns_name
+  web_alb_id       = module.web_app.web_alb_id
+}
 
 ####################################### Network Module #######################################
 module "network" {
@@ -13,12 +13,11 @@ module "network" {
 
 ####################################### Security Groups Module #######################################
 module "security_groups" {
-  source     = "./modules/security_groups"
-  vpc_id     = module.network.vpc_id
-  depends_on = [module.network]
+  source = "./modules/security_groups"
+  vpc_id = module.network.vpc_id
 }
 
-####################################### Web Application Module #######################################
+# ####################################### Web Application Module #######################################
 module "web_app" {
   source                = "./modules/web_app"
   image_id              = "ami-0866a3c8686eaeeba"
@@ -30,7 +29,7 @@ module "web_app" {
   depends_on            = [module.application_servers]
 }
 
-####################################### Application Servers Module #######################################
+# ####################################### Application Servers Module #######################################
 module "application_servers" {
   source                = "./modules/application_servers"
   image_id              = "ami-0866a3c8686eaeeba"
@@ -48,6 +47,5 @@ module "database" {
   vpc_cidr              = module.network.vpc_cidr
   public_subnet_app_ids = module.network.public_subnet_app_ids
   MongoDB_sg_id         = module.security_groups.MongoDB_sg_id
-  depends_on            = [module.security_groups]
 }
 
