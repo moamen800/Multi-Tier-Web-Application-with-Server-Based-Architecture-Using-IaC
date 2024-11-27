@@ -24,19 +24,19 @@ git clone https://github.com/Kuzma02/Simple-MERN-App || { echo "Failed to clone 
 cd Simple-MERN-App || { echo "Failed to navigate to repository directory"; exit 1; }
 
 # Step 4: Fetch the DNS name of the Application Load Balancer (ALB)
-APP_ALB_DNS=$(aws elbv2 describe-load-balancers \
-    --names "app-servers-alb" \
+Business_logic_ALB_DNS=$(aws elbv2 describe-load-balancers \
+    --names "business-logic-alb" \
     --query "LoadBalancers[0].DNSName" \
     --output text)
 
 # Check if the DNS name was successfully retrieved
-if [ -z "$APP_ALB_DNS" ]; then
+if [ -z "$Business_logic_ALB_DNS" ]; then
   echo "Failed to retrieve ALB DNS. Exiting."
   exit 1
 fi
 
-echo "Replacing 'localhost' with the ALB DNS name ($APP_ALB_DNS)..."
-find . -type f -exec sed -i "s/localhost/$APP_ALB_DNS/g" {} +
+echo "Replacing 'localhost' with the ALB DNS name ($Business_logic_ALB_DNS)..."
+find . -type f -exec sed -i "s/localhost/$Business_logic_ALB_DNS/g" {} +
 
 # Step 5: Install client dependencies
 echo "Installing client-side dependencies..."
@@ -67,17 +67,17 @@ sudo cp -r dist/* /var/www/html/ || { echo "Failed to deploy frontend files"; ex
 
 # Step 9: Output the URL for testing the deployment
 # Fetch the DNS name of the internet-facing Application Load Balancer (ALB)
-WEB_ALB_DNS=$(aws elbv2 describe-load-balancers \
-    --names "web-app-alb" \
+Presentation_ALB_DNS=$(aws elbv2 describe-load-balancers \
+    --names "presentation-alb" \
     --query "LoadBalancers[0].DNSName" \
     --output text)
 
 # Check if the DNS name was successfully retrieved
-if [ -z "$WEB_ALB_DNS" ]; then
+if [ -z "$Presentation_ALB_DNS" ]; then
   echo "Failed to retrieve ALB DNS. Exiting."
   exit 1
 fi
 
 # Output the URL for testing the frontend deployment
-echo "Frontend is accessible at http://$WEB_ALB_DNS"
+echo "Frontend is accessible at http://$Presentation_ALB_DNS"
 

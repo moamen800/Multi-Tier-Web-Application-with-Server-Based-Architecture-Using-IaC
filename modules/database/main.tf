@@ -1,8 +1,8 @@
 ####################################### MongoDB Database #######################################
 # Create Subnet Group for Amazon DocumentDB Cluster
 resource "aws_docdb_subnet_group" "documentdb_subnet_group" {
-  name       = "documentdb-subnet-group" # Name for the subnet group
-  subnet_ids = var.public_subnet_app_ids # Specify actual subnet IDs within your VPC
+  name       = "documentdb-subnet-group"        # Name for the subnet group
+  subnet_ids = var.public_subnet_documentDB_ids # Specify actual subnet IDs within your VPC
 
   tags = {
     Name = "DocumentDB Subnet Group"
@@ -16,7 +16,7 @@ resource "aws_docdb_cluster" "documentdb_cluster" {
   master_password        = var.db_password                                     # Master password for the database (use a secure password)
   skip_final_snapshot    = true                                                # Skip final snapshot during deletion (optional for dev environments)
   db_subnet_group_name   = aws_docdb_subnet_group.documentdb_subnet_group.name # Attach to the subnet group
-  vpc_security_group_ids = [var.MongoDB_sg_id]                                 # Attach to the security group
+  vpc_security_group_ids = [var.DocumentDB_sg_id]                              # Attach to the security group
   storage_encrypted      = true                                                # Enable storage encryption for security
 
   tags = {

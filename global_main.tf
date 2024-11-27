@@ -1,51 +1,47 @@
-####################################### edge Module #######################################
-module "edge_layer" {
-  source           = "./modules/edge_layer"
-  aws_region       = var.aws_region
-  web_alb_dns_name = module.web_app.web_alb_dns_name
-  web_alb_id       = module.web_app.web_alb_id
-}
-
-####################################### Network Module #######################################
+# Initialize the modules
 module "network" {
   source = "./modules/network"
 }
 
-####################################### Security Groups Module #######################################
 module "security_groups" {
   source = "./modules/security_groups"
   vpc_id = module.network.vpc_id
 }
 
-# ####################################### Web Application Module #######################################
-module "web_app" {
-  source                = "./modules/web_app"
-  image_id              = "ami-0866a3c8686eaeeba"
-  vpc_id                = module.network.vpc_id
-  vpc_cidr              = module.network.vpc_cidr
-  public_subnet_web_ids = module.network.public_subnet_web_ids
-  web_alb_sg_id         = module.security_groups.web_alb_sg_id
-  web_sg_id             = module.security_groups.web_sg_id
-  depends_on            = [module.application_servers]
+module "edge_layer" {
+  source                    = "./modules/edge_layer"
+  aws_region                = var.aws_region
+  presentation_alb_dns_name = module.presentation.presentation_alb_dns_name
+  presentation_alb_id       = module.presentation.presentation_alb_id
 }
 
-# ####################################### Application Servers Module #######################################
-module "application_servers" {
-  source                = "./modules/application_servers"
-  image_id              = "ami-0866a3c8686eaeeba"
-  vpc_id                = module.network.vpc_id
-  public_subnet_app_ids = module.network.public_subnet_app_ids
-  app_alb_sg_id         = module.security_groups.app_alb_sg_id
-  app_sg_id             = module.security_groups.app_sg_id
-  MongoDB_sg_id         = module.security_groups.MongoDB_sg_id
-  depends_on            = [module.database]
+module "presentation" {
+  source                 = "./modules/presentation"
+  image_id               = var.image_id
+  vpc_id                 = module.network.vpc_id
+  vpc_cidr               = module.network.vpc_cidr
+  public_subnet_ids      = module.network.public_subnet_ids
+  presentation_alb_sg_id = module.security_groups.presentation_alb_sg_id
+  presentation_sg_id     = module.security_groups.presentation_sg_id
+  depends_on             = [module.business_logic]
+}
+
+module "business_logic" {
+  source                   = "./modules/business_logic"
+  image_id                 = var.image_id
+  vpc_id                   = module.network.vpc_id
+  public_subnet_ids        = module.network.public_subnet_ids
+  business_logic_alb_sg_id = module.security_groups.business_logic_alb_sg_id
+  business_logic_sg_id     = module.security_groups.business_logic_sg_id
+  DocumentDB_sg_id         = module.security_groups.DocumentDB_sg_id
+  depends_on               = [module.database]
 }
 
 module "database" {
-  source                = "./modules/database"
-  vpc_id                = module.network.vpc_id
-  vpc_cidr              = module.network.vpc_cidr
-  public_subnet_app_ids = module.network.public_subnet_app_ids
-  MongoDB_sg_id         = module.security_groups.MongoDB_sg_id
+  source                       = "./modules/database"
+  vpc_id                       = module.network.vpc_id
+  vpc_cidr                     = module.network.vpc_cidr
+  public_subnet_documentDB_ids = module.network.public_subnet_documentDB_ids
+  DocumentDB_sg_id             = module.security_groups.DocumentDB_sg_id
+  depends_on                   = [module.network]
 }
-

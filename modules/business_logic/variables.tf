@@ -7,20 +7,20 @@ variable "vpc_id" {
 }
 
 # List of Public Subnet IDs where the Application Load Balancer and other resources will reside
-variable "public_subnet_app_ids" {
+variable "public_subnet_ids" {
   description = "List of Public Subnet IDs"
   type        = list(string) # A list of strings to hold multiple subnet IDs
 }
 
-# Security group ID for the web application load balancer (ALB)
-variable "app_alb_sg_id" {
-  description = "Security group ID for the web application load balancer"
+# Security group ID for the presentation business_logiclication load balancer (ALB)
+variable "business_logic_alb_sg_id" {
+  description = "Security group ID for the presentation business_logiclication load balancer"
   type        = string # A string type to hold the ID of the security group associated with the ALB
 }
 
-# The ID of the web security group for instance
-variable "app_sg_id" {
-  description = "The ID of the web security group for instances"
+# The ID of the presentation security group for instance
+variable "business_logic_sg_id" {
+  description = "The ID of the presentation security group for instances"
   type        = string # A string type to hold the security group ID for the EC2 instances
 }
 
@@ -29,7 +29,7 @@ variable "image_id" {
   type        = string
 }
 
-variable "MongoDB_sg_id" {
-  description = "The ID of the web security group for instances"
+variable "DocumentDB_sg_id" {
+  description = "The ID of the presentation security group for instances"
   type        = string
 }

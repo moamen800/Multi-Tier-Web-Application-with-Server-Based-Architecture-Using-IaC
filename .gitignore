@@ -21,18 +21,6 @@ FolderStructure_serverbased.txt
 # PEM file for your key pair, used for SSH or other secure connections.
 keypair.pem
 
-# Scripts File
-# Text file containing custom scripts for your project.
-scripts.txt
-
-# Simple MERN App Archive
-# A ZIP file containing your Simple MERN application.
-Simple-MERN-App.zip
-
-# HTML File
-# An index HTML file for your web application or project.
-index1.html
-
 # Commands
 # File containing various commands used for your Terraform project or server setup.
 commands

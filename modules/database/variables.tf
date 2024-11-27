@@ -8,13 +8,13 @@ variable "vpc_cidr" {
   type        = string
 }
 
-variable "public_subnet_app_ids" {
+variable "public_subnet_documentDB_ids" {
   description = "List of subnet IDs for the DB subnet group"
   type        = list(string)
 }
 
-variable "MongoDB_sg_id" {
-  description = "The ID of the web security group for instances"
+variable "DocumentDB_sg_id" {
+  description = "The ID of the presentation security group for instances"
   type        = string
 }
 

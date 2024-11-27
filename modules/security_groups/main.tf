@@ -1,6 +1,6 @@
-####################################### ALB Security Group (web_alb_sg) #######################################
-resource "aws_security_group" "web_alb_sg" {
-  name   = "web_alb_sg"
+####################################### ALB Security Group (presentation_alb_sg) #######################################
+resource "aws_security_group" "presentation_alb_sg" {
+  name   = "presentation_alb_sg"
   vpc_id = var.vpc_id
 
   # HTTP Ingress (Port 80) – Allow incoming HTTP traffic to the ALB
@@ -20,21 +20,21 @@ resource "aws_security_group" "web_alb_sg" {
   }
 
   tags = {
-    Name = "web-alb-sg"
+    Name = "presentation-alb-sg"
   }
 }
 
-####################################### Web Security Group (web_sg) #######################################
-resource "aws_security_group" "web_sg" {
-  name   = "web_sg"
+####################################### Web Security Group (presentation_sg) #######################################
+resource "aws_security_group" "presentation_sg" {
+  name   = "presentation_sg"
   vpc_id = var.vpc_id
 
   ingress {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-    # security_groups = [aws_security_group.web_alb_sg.id]
+    # cidr_blocks = ["0.0.0.0/0"]
+    security_groups = [aws_security_group.presentation_alb_sg.id]
   }
 
   # Allow SSH (Port 22) – Use with caution, allows SSH access from anywhere
@@ -54,13 +54,13 @@ resource "aws_security_group" "web_sg" {
   }
 
   tags = {
-    Name = "web-sg"
+    Name = "presentation-sg"
   }
 }
 
-####################################### ALB Security Group (app_alb_sg) #######################################
-resource "aws_security_group" "app_alb_sg" {
-  name   = "app-alb-sg"
+####################################### ALB Security Group (business_logic_alb_sg) #######################################
+resource "aws_security_group" "business_logic_alb_sg" {
+  name   = "business_logic_alb_sg"
   vpc_id = var.vpc_id
 
   ingress {
@@ -68,7 +68,7 @@ resource "aws_security_group" "app_alb_sg" {
     to_port     = 3000
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
-    # security_groups = [aws_security_group.web_sg.id]
+    # security_groups = [aws_security_group.presentation_sg.id]
   }
 
   # Outbound rule – Allow all outbound traffic
@@ -80,21 +80,21 @@ resource "aws_security_group" "app_alb_sg" {
   }
 
   tags = {
-    Name = "app-alb-sg"
+    Name = "business_logic_alb_sg"
   }
 }
 
-####################################### app Security Group (app_sg) #######################################
-resource "aws_security_group" "app_sg" {
-  name   = "app-sg"
+####################################### business_logic Security Group (business_logic_sg) #######################################
+resource "aws_security_group" "business_logic_sg" {
+  name   = "business_logic_sg"
   vpc_id = var.vpc_id
 
   ingress {
     from_port   = 3000
     to_port     = 3000
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-    # security_groups = [aws_security_group.app_alb_sg.id]
+    # cidr_blocks = ["0.0.0.0/0"]
+    security_groups = [aws_security_group.business_logic_alb_sg.id]
 
   }
 
@@ -115,22 +115,22 @@ resource "aws_security_group" "app_sg" {
   }
 
   tags = {
-    Name = "app-sg"
+    Name = "business_logic_sg"
   }
 }
 
 ####################################### database Security Group (db_sg) #######################################
-resource "aws_security_group" "MongoDB_sg" {
-  name        = "MongoDB_sg"
+resource "aws_security_group" "DocumentDB_sg" {
+  name        = "DocumentDB_sg"
   description = "Allow access to MONGO DB"
   vpc_id      = var.vpc_id
 
   ingress {
-    from_port   = 27017
-    to_port     = 27017
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-    # security_groups = [aws_security_group.app_sg.id]
+    from_port = 27017
+    to_port   = 27017
+    protocol  = "tcp"
+    # cidr_blocks = ["0.0.0.0/0"]
+    security_groups = [aws_security_group.business_logic_sg.id]
   }
 
   # Outbound rule – Allow all outbound traffic
@@ -142,6 +142,6 @@ resource "aws_security_group" "MongoDB_sg" {
   }
 
   tags = {
-    Name = "MongoDB_sg"
+    Name = "DocumentDB_sg"
   }
 }

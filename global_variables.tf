@@ -9,3 +9,9 @@ variable "aws_profile" {
   description = "AWS profile to use for authentication"
   default     = "default" # Default profile
 }
+
+variable "image_id" {
+  description = "The ID of the AMI to use"
+  type        = string
+  default     = "ami-0866a3c8686eaeeba"
+}

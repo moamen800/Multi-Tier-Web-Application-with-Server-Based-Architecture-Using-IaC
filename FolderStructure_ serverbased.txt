@@ -3,18 +3,19 @@ aws-architecture_serverbased/
 ├── global_variables.tf
 ├── global_outputs.tf
 ├── data-sources.tf
+├── provider.tf
 ├── terraform.tfvars
 ├── modules/
 │   ├── network/
 │   │   ├── main.tf
 │   │   ├── variables.tf
 │   │   └── outputs.tf
-│   ├── web_app/
+│   ├── Presebtation/
 │   │   ├── main.tf
 │   │   ├── variables.tf
 │   │   ├── outputs.tf
 │   │   └── frontend.sh
-│   ├── application_servers/
+│   ├── business_logic/
 │   │   ├── main.tf
 │   │   ├── variables.tf
 │   │   ├── outputs.tf
