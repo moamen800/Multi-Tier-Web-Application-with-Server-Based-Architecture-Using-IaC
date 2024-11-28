@@ -18,16 +18,10 @@ else
     echo "AWS CLI is already installed."
 fi
 
-# Install and start the Apache server
-echo "Installing and starting Apache server..."
-sudo apt-get install -y apache2 || { echo "Failed to install Apache"; exit 1; }
-sudo systemctl enable apache2
-sudo systemctl start apache2
-
 # Step 3: Clone the MERN application repository
-echo "Cloning the MERN-Stack-Hospital-Management-System-Web-Application repository..."
-git clone https://github.com/Zeeshu911/MERN-Stack-Hospital-Management-System-Web-Application || { echo "Failed to clone repository"; exit 1; }
-cd MERN-Stack-Hospital-Management-System-Web-Application || { echo "Failed to navigate to backend directory"; exit 1; }
+echo "Cloning the Simple-MERN-App repository..."
+git clone https://github.com/Kuzma02/Simple-MERN-App || { echo "Failed to clone repository"; exit 1; }
+cd Simple-MERN-App || { echo "Failed to navigate to repository directory"; exit 1; }
 
 # Step 4: Fetch the DNS name of the Application Load Balancer (ALB)
 Business_logic_ALB_DNS=$(aws elbv2 describe-load-balancers \
@@ -45,8 +39,8 @@ echo "Replacing 'localhost' with the ALB DNS name ($Business_logic_ALB_DNS)..."
 find . -type f -exec sed -i "s/localhost/$Business_logic_ALB_DNS/g" {} +
 
 # Step 5: Install client dependencies
-echo "Installing frontend-side dependencies..."
-cd frontend || { echo "Failed to navigate to frontend directory"; exit 1; }
+echo "Installing client-side dependencies..."
+cd client || { echo "Failed to navigate to client directory"; exit 1; }
 
 echo "Updating package lists and installing npm..."
 sudo apt-get install -y npm || { echo "Failed to install npm"; exit 1; }
@@ -55,15 +49,23 @@ echo "Installing Node.js dependencies..."
 npm install || { echo "Failed to install Node.js dependencies"; exit 1; }
 npm audit fix
 
-# Step 6: Build the frontend
+# Step 6: Install and start the Apache server
+cd ..
+echo "Installing and starting Apache server..."
+sudo apt-get install -y apache2 || { echo "Failed to install Apache"; exit 1; }
+sudo systemctl enable apache2
+sudo systemctl start apache2
+
+# Step 7: Build the frontend
+cd client || { echo "Failed to navigate to client directory"; exit 1; }
 echo "Building the frontend..."
 npm run build || { echo "Failed to build frontend"; exit 1; }
 
-# Step 7: Deploy frontend files to Apache's web directory
+# Step 8: Deploy frontend files to Apache's web directory
 echo "Deploying frontend to Apache server..."
 sudo cp -r dist/* /var/www/html/ || { echo "Failed to deploy frontend files"; exit 1; }
 
-# Step 8: Output the URL for testing the deployment
+# Step 9: Output the URL for testing the deployment
 # Fetch the DNS name of the internet-facing Application Load Balancer (ALB)
 Presentation_ALB_DNS=$(aws elbv2 describe-load-balancers \
     --names "presentation-alb" \
@@ -78,4 +80,3 @@ fi
 
 # Output the URL for testing the frontend deployment
 echo "Frontend is accessible at http://$Presentation_ALB_DNS"
-
