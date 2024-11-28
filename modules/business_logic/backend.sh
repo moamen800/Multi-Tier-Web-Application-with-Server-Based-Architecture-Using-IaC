@@ -1,4 +1,3 @@
-
 #!/bin/bash
 
 # Step 1: Update package lists and install required tools
@@ -28,6 +27,7 @@ cd Simple-MERN-App || { echo "Failed to navigate to repository directory"; exit 
 # Step 4: Install npm
 echo "Installing npm..."
 sudo apt-get install -y npm || { echo "Failed to install npm"; exit 1; }
+
 
 # Step 5: Install Node.js if not already installed
 echo "Checking for Node.js installation..."
@@ -74,6 +74,7 @@ echo ".env file configured successfully."
 echo "Installing app dependencies..."
 npm install || { echo "Failed to install app dependencies"; exit 1; }
 npm audit fix || { echo "npm audit fix failed"; exit 1; }
+npm install cors
 
 # Step 10: Start the app using pm2
 echo "Starting the app using pm2..."

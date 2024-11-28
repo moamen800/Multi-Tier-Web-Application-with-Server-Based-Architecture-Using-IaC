@@ -38,6 +38,8 @@ fi
 echo "Replacing 'localhost' with the ALB DNS name ($Business_logic_ALB_DNS)..."
 find . -type f -exec sed -i "s/localhost/$Business_logic_ALB_DNS/g" {} +
 
+npm install cors
+
 # Step 5: Install client dependencies
 echo "Installing client-side dependencies..."
 cd client || { echo "Failed to navigate to client directory"; exit 1; }
