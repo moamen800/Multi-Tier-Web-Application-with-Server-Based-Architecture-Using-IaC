@@ -76,7 +76,7 @@ resource "aws_autoscaling_group" "presentation_asg" {
   health_check_type   = "EC2"
   vpc_zone_identifier = var.public_subnet_ids                               # Use available AZs dynamically fetched 
   target_group_arns   = [aws_lb_target_group.presentation_target_group.arn] # Add the target group ARN
-
+  depends_on = [aws_lb.presentation_alb]
   launch_template {
     id      = aws_launch_template.presentation_launch_template.id # Reference the launch template ID
     version = "$Latest"                                           # Use the latest version of the launch template

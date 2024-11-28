@@ -12,6 +12,11 @@ variable "public_subnet_ids" {
   type        = list(string) # A list of strings to hold multiple subnet IDs
 }
 
+variable "private_subnets_ids" {
+  description = "List of subnet IDs for the DB subnet group"
+  type        = list(string)
+}
+
 # Security group ID for the presentation business_logiclication load balancer (ALB)
 variable "business_logic_alb_sg_id" {
   description = "Security group ID for the presentation business_logiclication load balancer"
