@@ -20,15 +20,15 @@ else
 fi
 
 # Step 3: Clone the repository
-echo "Cloning the Simple-MERN-App repository..."
-git clone https://github.com/Kuzma02/Simple-MERN-App || { echo "Failed to clone repository"; exit 1; }
-cd Simple-MERN-App || { echo "Failed to navigate to repository directory"; exit 1; }
+echo "Cloning the MERN-Stack-Hospital-Management-System-Web-Application repository..."
+git clone https://github.com/Zeeshu911/MERN-Stack-Hospital-Management-System-Web-Application  || { echo "Failed to clone repository"; exit 1; }
+cd MERN-Stack-Hospital-Management-System-Web-Application/backend || { echo "Failed to navigate to backend directory"; exit 1; }
 
 # Step 4: Install npm
 echo "Installing npm..."
 sudo apt-get install -y npm || { echo "Failed to install npm"; exit 1; }
 
-# Step 5: Install Node.js if not already installed
+# Step 5: Install Node.js
 echo "Checking for Node.js installation..."
 if ! command -v node &> /dev/null; then
     echo "Node.js not found. Installing Node.js..."
@@ -38,7 +38,7 @@ else
     echo "Node.js is already installed."
 fi
 
-# Step 6: Install pm2 globally if not already installed
+# Step 6: Install pm2 globally
 echo "Checking for pm2 installation..."
 if ! command -v pm2 &> /dev/null; then
     echo "pm2 not found. Installing pm2..."
@@ -60,13 +60,28 @@ if [ "$DB_ENDPOINT" == "None" ] || [ -z "$DB_ENDPOINT" ]; then
     echo "Failed to retrieve DocumentDB cluster endpoint. Please verify your cluster name and AWS credentials."
     exit 1
 fi
-
 echo "DocumentDB Cluster endpoint: $DB_ENDPOINT"
+
+Presentation_ALB_DNS=$(aws elbv2 describe-load-balancers \
+    --names "presentation-alb" \
+    --query "LoadBalancers[0].DNSName" \
+    --output text)
+
+# Check if the DNS name was successfully retrieved
+if [ -z "$Presentation_ALB_DNS" ]; then
+  echo "Failed to retrieve ALB DNS. Exiting."
+  exit 1
+fi
 
 # Create the .env file
 touch .env
 echo "MONGO_URI=mongodb://Moamen:moamen146@$DB_ENDPOINT:27017/?tls=true&tlsCAFile=global-bundle.pem&replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false" > .env
-echo "PORT=3000" >> .env
+echo "PORT=4000" >> .env
+echo "FRONTEND_URL_ONE=http://$Presentation_ALB_DNS" >> .env
+echo "FRONTEND_URL_TWO=http://$Presentation_ALB_DNS" >> .env
+echo "CLOUDINARY_CLOUD_NAME=dt8alw9ab" >> .env
+echo "CLOUDINARY_API_KEY=527568464455975" >> .env
+echo "CLOUDINARY_API_SECRET=I8PD02bkyvQ9GVn0tW8NYuWFeFQ" >> .env
 echo ".env file configured successfully."
 
 # Step 9: Install app dependencies
@@ -76,12 +91,12 @@ npm audit fix || { echo "npm audit fix failed"; exit 1; }
 
 # Step 10: Start the app using pm2
 echo "Starting the app using pm2..."
-pm2 start app.js --name Simple-MERN-App || { echo "Failed to start the app with pm2"; exit 1; }
+pm2 start app.js --name MERN-Stack-Hospital-Management-System-Web-Application || { echo "Failed to start the app with pm2"; exit 1; }
 pm2 save
 pm2 startup systemd || { echo "Failed to configure pm2 for startup"; exit 1; }
 
 # Step 11: Verify if the app started successfully
-if pm2 list | grep -q "Simple-MERN-App"; then
+if pm2 list | grep -q "MERN-Stack-Hospital-Management-System-Web-Application"; then
     echo "Backend application started successfully with pm2."
 else
     echo "Failed to start the backend application with pm2."

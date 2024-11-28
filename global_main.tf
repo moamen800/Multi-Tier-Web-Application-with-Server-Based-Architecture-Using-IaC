@@ -8,12 +8,12 @@ module "security_groups" {
   vpc_id = module.network.vpc_id
 }
 
-module "edge_layer" {
-  source                    = "./modules/edge_layer"
-  aws_region                = var.aws_region
-  presentation_alb_dns_name = module.presentation.presentation_alb_dns_name
-  presentation_alb_id       = module.presentation.presentation_alb_id
-}
+# module "edge_layer" {
+#   source                    = "./modules/edge_layer"
+#   aws_region                = var.aws_region
+#   presentation_alb_dns_name = module.presentation.presentation_alb_dns_name
+#   presentation_alb_id       = module.presentation.presentation_alb_id
+# }
 
 module "presentation" {
   source                 = "./modules/presentation"
@@ -41,7 +41,7 @@ module "database" {
   source                       = "./modules/database"
   vpc_id                       = module.network.vpc_id
   vpc_cidr                     = module.network.vpc_cidr
-  public_subnet_documentDB_ids = module.network.public_subnet_documentDB_ids
+  private_subnets_ids          = module.network.private_subnets_ids
   DocumentDB_sg_id             = module.security_groups.DocumentDB_sg_id
   depends_on                   = [module.network]
 }

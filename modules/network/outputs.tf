@@ -14,7 +14,7 @@ output "public_subnet_ids" {
   value       = [for subnet in aws_subnet.public_subnets : subnet.id] # Loop through public subnets and extract their IDs
 }
 
-output "public_subnet_documentDB_ids" {
-  description = "List of Public Subnet IDs"
-  value       = [for subnet in aws_subnet.public_subnets_documentDB : subnet.id] # Loop through public subnets and extract their IDs
+output "private_subnets_ids" {
+  description = "List of Private Subnet IDs"
+  value       = [for subnet in aws_subnet.private_subnets : subnet.id] # Loop through private subnets and extract their IDs
 }
