@@ -33,8 +33,8 @@ resource "aws_security_group" "presentation_sg" {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-    # security_groups = [aws_security_group.presentation_alb_sg.id]
+    # cidr_blocks = ["0.0.0.0/0"]
+    security_groups = [aws_security_group.presentation_alb_sg.id]
   }
 
   # Allow SSH (Port 22) – Use with caution, allows SSH access from anywhere
@@ -93,8 +93,8 @@ resource "aws_security_group" "business_logic_sg" {
     from_port   = 3000
     to_port     = 3000
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-    # security_groups = [aws_security_group.business_logic_alb_sg.id]
+    # cidr_blocks = ["0.0.0.0/0"]
+    security_groups = [aws_security_group.business_logic_alb_sg.id]
 
   }
 
@@ -130,7 +130,7 @@ resource "aws_security_group" "DocumentDB_sg" {
     to_port   = 27017
     protocol  = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
-    # security_groups = [aws_security_group.business_logic_sg.id]
+    security_groups = [aws_security_group.business_logic_sg.id]
   }
 
   # Outbound rule – Allow all outbound traffic

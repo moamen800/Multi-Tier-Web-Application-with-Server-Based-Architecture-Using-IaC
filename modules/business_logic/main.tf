@@ -66,7 +66,7 @@ resource "aws_launch_template" "business_logic_launch_template" {
 # Auto Scaling Group for the Web App, using the launch template
 resource "aws_autoscaling_group" "business_logic_asg" {
   name                = "business_logics_asg"
-  desired_capacity    = 1 # Desired number of instances
+  desired_capacity    = 2 # Desired number of instances
   max_size            = 2 # Maximum number of instances
   min_size            = 1 # Minimum number of instances
   health_check_type   = "EC2"
