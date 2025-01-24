@@ -42,5 +42,5 @@ resource "aws_cloudfront_distribution" "cdn" {
   }
 
   # Attach WAF Web ACL for additional security
-  web_acl_id = aws_wafv2_web_acl.WAF_web_acl.arn # Attach the WAF Web ACL
+  web_acl_id = aws_wafv2_web_acl.WAF_presentation_acl.arn # Attach the WAF Web ACL
 }
