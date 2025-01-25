@@ -117,3 +117,40 @@ resource "aws_internet_gateway" "main" {
     Name = "internet_gateway"
   }
 }
+
+####################################### Network ACL for Private Subnets #######################################
+# Create a Network ACL for private subnets
+resource "aws_network_acl" "private_nacl" {
+  vpc_id = aws_vpc.main.id
+
+  # Allow inbound TCP traffic
+  ingress {
+    protocol   = "tcp"
+    rule_no    = 100
+    action     = "allow"
+    cidr_block = "0.0.0.0/0"
+    from_port  = 0             # Allow all TCP ports
+    to_port    = 65535
+  }
+
+  # Allow outbound TCP traffic
+  egress {
+    protocol   = "tcp"
+    rule_no    = 200
+    action     = "allow"
+    cidr_block = "0.0.0.0/0"
+    from_port  = 0             # Allow all TCP ports
+    to_port    = 65535
+  }
+
+  tags = {
+    Name = "private_nacl"
+  }
+}
+
+# Associate the private NACL with each private subnet
+resource "aws_network_acl_association" "private_nacl_association" {
+  for_each   = aws_subnet.private
+  subnet_id  = each.value.id
+  network_acl_id = aws_network_acl.private_nacl.id
+}
