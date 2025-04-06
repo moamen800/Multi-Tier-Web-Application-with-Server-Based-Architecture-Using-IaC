@@ -23,4 +23,5 @@ keypair.pem
 
 # Commands
 # File containing various commands used for your Terraform project or server setup.
-commands
+commands.sh
+FolderStructure_ serverbased.txt

@@ -29,6 +29,16 @@ variable "image_id" {
   type        = string
 }
 
+variable "instance_type" {
+  description = "EC2 instance type"
+  type        = string
+}
+
+variable "key_name" {
+  description = "The name of the key pair to use for EC2 instances"
+  type        = string
+}
+
 variable "vpc_cidr" {
   description = "the cidr of the vpc"
   type        = string

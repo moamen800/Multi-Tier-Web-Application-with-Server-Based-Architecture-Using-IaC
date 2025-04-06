@@ -3,7 +3,7 @@
 resource "aws_lb" "business_logic_alb" {
   name               = "business-logic-alb"           # Name of the ALB
   internal           = false                          # Set to false for internet-facing ALB
-  load_balancer_type = "application"       # Type of load balancer (Application Load Balancer)
+  load_balancer_type = "application"                  # Type of load balancer (Application Load Balancer)
   subnets            = var.public_subnet_ids          # Use the public subnet IDs from variables
   security_groups    = [var.business_logic_alb_sg_id] # Use the security group ID from variables
 
@@ -54,8 +54,8 @@ resource "aws_launch_template" "business_logic_launch_template" {
   name_prefix            = "business-logic-launch-template"                 # Prefix for the launch template name
   image_id               = var.image_id                                     # Use the dynamically fetched Amazon Linux 2 AMI ID
   vpc_security_group_ids = [var.business_logic_sg_id]                       # Security group for instances launched from this template
-  instance_type          = "t2.micro"                                       # Instance type for the presentation business_logic (can be changed as needed)
-  key_name               = "keypair"                                        # Replace with your key pair name
+  instance_type          = var.instance_type                                # Instance type for the presentation business_logic (can be changed as needed)
+  key_name               = var.key_name                                     # Replace with your key pair name
   user_data              = filebase64(("${path.module}/backend.sh"))
   iam_instance_profile {
     name = aws_iam_instance_profile.business_logic_instance_profile.name
@@ -66,8 +66,8 @@ resource "aws_launch_template" "business_logic_launch_template" {
 # Auto Scaling Group for the Web App, using the launch template
 resource "aws_autoscaling_group" "business_logic_asg" {
   name                = "business_logics_asg"
-  desired_capacity    = 2 # Desired number of instances
-  max_size            = 2 # Maximum number of instances
+  desired_capacity    = 1 # Desired number of instances
+  max_size            = 1 # Maximum number of instances
   min_size            = 1 # Minimum number of instances
   health_check_type   = "EC2"
   vpc_zone_identifier = var.private_subnets_ids                                 # Use available AZs dynamically fetched
@@ -83,6 +83,11 @@ resource "aws_autoscaling_group" "business_logic_asg" {
     key                 = "Name"                    # Tag key for the instance's name
     value               = "business-logic-instance" # Name of the instances 
     propagate_at_launch = true                      # Ensure the tag is business_logiclied to instances when they are launched
+  }
+  tag {
+    key                 = "Title"
+    value               = "prometheus"
+    propagate_at_launch = true
   }
 }
 

@@ -4,8 +4,8 @@
 echo "Updating package list..."
 sudo apt-get update -y || { echo "Failed to update package list"; exit 1; }
 
-echo "Installing required tools (curl, unzip, git)..."
-sudo apt-get install -y curl unzip git || { echo "Failed to install required tools"; exit 1; }
+echo "Installing required tools (curl, unzip, git, wget)..."
+sudo apt-get install -y curl unzip git wget || { echo "Failed to install required tools"; exit 1; }
 
 # Step 2: Install AWS CLI if not already installed
 echo "Checking for AWS CLI installation..."
@@ -27,7 +27,6 @@ cd Simple-MERN-App || { echo "Failed to navigate to repository directory"; exit 
 # Step 4: Install npm
 echo "Installing npm..."
 sudo apt-get install -y npm || { echo "Failed to install npm"; exit 1; }
-
 
 # Step 5: Install Node.js if not already installed
 echo "Checking for Node.js installation..."
@@ -87,5 +86,49 @@ if pm2 list | grep -q "Simple-MERN-App"; then
     echo "Backend application started successfully with pm2."
 else
     echo "Failed to start the backend application with pm2."
+    exit 1
+fi
+
+# Step 12: Install Node Exporter
+echo "Installing Node Exporter..."
+cd ~
+wget https://github.com/prometheus/node_exporter/releases/download/v1.3.1/node_exporter-1.3.1.linux-amd64.tar.gz || { echo "Failed to download Node Exporter"; exit 1; }
+tar -xvf node_exporter-1.3.1.linux-amd64.tar.gz || { echo "Failed to extract Node Exporter"; exit 1; }
+
+# Create a dedicated user for Node Exporter
+sudo useradd --no-create-home --shell /bin/false node_exporter
+
+# Move the Node Exporter binary
+sudo mv node_exporter-1.3.1.linux-amd64/node_exporter /usr/local/bin/
+sudo chown node_exporter:node_exporter /usr/local/bin/node_exporter
+
+# Create Node Exporter service file
+echo "Creating Node Exporter service..."
+sudo tee /etc/systemd/system/node_exporter.service > /dev/null <<EOF
+[Unit]
+Description=Node Exporter
+After=network.target
+
+[Service]
+User=node_exporter
+Group=node_exporter
+Type=simple
+ExecStart=/usr/local/bin/node_exporter
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+# Start and enable Node Exporter
+echo "Starting Node Exporter service..."
+sudo systemctl daemon-reload
+sudo systemctl start node_exporter
+sudo systemctl enable node_exporter
+
+# Verify Node Exporter installation
+if systemctl is-active --quiet node_exporter; then
+    echo "✅ Node Exporter has been installed and started successfully."
+else
+    echo "❌ Node Exporter installation failed."
     exit 1
 fi

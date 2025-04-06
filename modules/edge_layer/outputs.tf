@@ -12,10 +12,10 @@ output "cloudfront_distribution_arn" {
 
 
 ##############################################  WAF Output  ##############################################
-output "WAF_web_acl" {
-  description = "The ARN of the WAF Web ACL"
-  value       = aws_wafv2_web_acl.WAF_presentation_acl.arn # Retrieves the ARN for reference or for connecting other resources
-}
+# output "WAF_web_acl" {
+#   description = "The ARN of the WAF Web ACL"
+#   value       = aws_wafv2_web_acl.WAF_presentation_acl.arn # Retrieves the ARN for reference or for connecting other resources
+# }
 
 
 

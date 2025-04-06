@@ -101,7 +101,7 @@ resource "aws_eip" "nat_gateway_eip" {
 # Create a NAT Gateway to enable internet access for private subnets
 resource "aws_nat_gateway" "main" {
   allocation_id = aws_eip.nat_gateway_eip.id                 # Use the allocated EIP
-  subnet_id     = aws_subnet.public["us-east-1a"].id # Attach to a public subnet (ensure correct AZ)
+  subnet_id     = aws_subnet.public["eu-west-1a"].id # Attach to a public subnet (ensure correct AZ)
 
   tags = {
     Name = "nat_gateway"

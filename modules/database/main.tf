@@ -18,7 +18,7 @@ resource "aws_docdb_cluster" "documentdb_cluster" {
   db_subnet_group_name   = aws_docdb_subnet_group.documentdb_subnet_group.name # Attach to the subnet group
   vpc_security_group_ids = [var.DocumentDB_sg_id]                              # Attach to the security group
   storage_encrypted      = true                                                # Enable storage encryption for security
-
+  enabled_cloudwatch_logs_exports = ["profiler", "audit"]                      # Enable CloudWatch logs exports for profiler and audit logs
   tags = {
     Name = "DocumentDB Cluster"
   }
@@ -27,7 +27,7 @@ resource "aws_docdb_cluster" "documentdb_cluster" {
 # Create an instance in the DocumentDB Cluster
 resource "aws_docdb_cluster_instance" "documentdb_instance" {
   cluster_identifier = aws_docdb_cluster.documentdb_cluster.id # Reference the DocumentDB cluster
-  instance_class     = "db.t3.medium"                          # Choose instance type for the database
+  instance_class     = var.instance_type                       # Choose instance type for the database
   engine             = "docdb"                                 # Set the engine type to DocumentDB
 
   tags = {

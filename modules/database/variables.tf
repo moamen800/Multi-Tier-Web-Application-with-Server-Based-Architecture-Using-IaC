@@ -36,3 +36,9 @@ variable "db_password" {
   default     = "moamen146"
   # sensitive   = true
 }
+
+variable "instance_type" {
+  description = "EC2 instance type"
+  type        = string
+  default     = "db.t3.medium"
+}

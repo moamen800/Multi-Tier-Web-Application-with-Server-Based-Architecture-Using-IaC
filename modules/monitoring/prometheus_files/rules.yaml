@@ -1,0 +1,28 @@
+groups:
+
+  - name: Node_exporters
+    rules:
+    - record: Status_Nodes_Exporters
+      expr: up{job="EC2_discover"}
+      labels:
+        node: "node_exporter"
+    - alert: NodeDown
+      expr: Status_Nodes_Exporters == 0
+      labels:
+        node: "NodeDown"
+      for: 0s
+
+  - name: Free_memory
+    rules:
+    - record: Free_memory_avaliable
+      expr: node_memory_MemAvailable_bytes / 1024 / 1024
+
+  - name: CPU_Alerts
+    rules:
+    - alert: HighCpuLoad
+      expr: 100 - (avg by(instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 40
+      labels:
+        node: "HighCPU"
+      annotations:
+        summary: "High CPU load detected on {{ $labels.instance }}"
+        description: "CPU load is over 40% (current value: {{ $value }}%)."

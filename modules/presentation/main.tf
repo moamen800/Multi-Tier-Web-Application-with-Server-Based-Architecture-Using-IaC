@@ -13,7 +13,6 @@ resource "aws_lb" "presentation_alb" {
 }
 
 ####################################### ALB Listener #######################################
-
 # Add a Listener to the ALB to forward HTTP traffic to the Target Group
 resource "aws_lb_listener" "http_listener" {
   load_balancer_arn = aws_lb.presentation_alb.arn # Associate with the ALB's ARN
@@ -27,7 +26,6 @@ resource "aws_lb_listener" "http_listener" {
 }
 
 ####################################### ALB Target Group #######################################
-
 # Create a Target Group for the ALB to route traffic
 resource "aws_lb_target_group" "presentation_target_group" {
   name     = "presentation-target-group" # Name of the target group
@@ -51,14 +49,13 @@ resource "aws_lb_target_group" "presentation_target_group" {
 }
 
 ####################################### Launch Template #######################################
-
 # Launch Template using the dynamically fetched image_id
 resource "aws_launch_template" "presentation_launch_template" {
   name_prefix            = "presentation-launch-template" # Prefix for the launch template name
   image_id               = var.image_id                   # Use the dynamically fetched Amazon Linux 2 AMI ID
   vpc_security_group_ids = [var.presentation_sg_id]       # Security group for instances launched from this template
-  instance_type          = "t2.micro"                     # Instance type for the presentation app (can be changed as needed)
-  key_name               = "keypair"                      # Replace with your key pair name 
+  instance_type          = var.instance_type              # Instance type for the presentation app (can be changed as needed)
+  key_name               = var.key_name                   # Replace with your key pair name 
   user_data              = filebase64(("${path.module}/frontend.sh"))
   iam_instance_profile {
     name = aws_iam_instance_profile.presentation_instance_profile.name
@@ -66,11 +63,10 @@ resource "aws_launch_template" "presentation_launch_template" {
 }
 
 ####################################### Auto Scaling Group #######################################
-
 # Auto Scaling Group for the Web App, using the launch template
 resource "aws_autoscaling_group" "presentation_asg" {
   name                = "presentation_asg"
-  desired_capacity    = 2 # Desired number of instances
+  desired_capacity    = 1 # Desired number of instances
   max_size            = 2 # Maximum number of instances
   min_size            = 1 # Minimum number of instances
   health_check_type   = "EC2"
@@ -88,10 +84,14 @@ resource "aws_autoscaling_group" "presentation_asg" {
     value               = "presentation-instance" # Name of the instances 
     propagate_at_launch = true                    # Ensure the tag is applied to instances when they are launched
   }
+  tag {
+    key                 = "Title"
+    value               = "prometheus"
+    propagate_at_launch = true
+  }
 }
 
 ####################################### IAM Roles and Policies #######################################
-
 # IAM Role for EC2 instances
 resource "aws_iam_role" "presentation_role" {
   name = "presentation-role"

@@ -18,8 +18,8 @@ variable "public_subnets" {
   description = "Map of public subnets by availability zone"
   type        = map(string)
   default = {
-    "us-east-1a" = "10.0.1.0/24"
-    "us-east-1b" = "10.0.2.0/24"
+    "eu-west-1a" = "10.0.1.0/24"
+    "eu-west-1b" = "10.0.2.0/24"
   }
 }
 
@@ -28,7 +28,7 @@ variable "private_subnets" {
   description = "Map of private subnets by availability zone"
   type        = map(string)
   default = {
-    "us-east-1a" = "10.0.100.0/24"
-    "us-east-1b" = "10.0.200.0/24"
+    "eu-west-1a" = "10.0.100.0/24"
+    "eu-west-1b" = "10.0.200.0/24"
   }
 }

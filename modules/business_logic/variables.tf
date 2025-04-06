@@ -34,6 +34,16 @@ variable "image_id" {
   type        = string
 }
 
+variable "key_name" {
+  description = "The name of the key pair to use for EC2 instances"
+  type        = string
+}
+
+variable "instance_type" {
+  description = "EC2 instance type"
+  type        = string
+}
+
 variable "DocumentDB_sg_id" {
   description = "The ID of the presentation security group for instances"
   type        = string

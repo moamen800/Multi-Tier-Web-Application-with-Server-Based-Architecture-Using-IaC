@@ -1,4 +1,6 @@
+########################
 # Initialize the modules
+########################
 module "network" {
   source = "./modules/network"
 }
@@ -18,6 +20,8 @@ module "edge_layer" {
 module "presentation" {
   source                 = "./modules/presentation"
   image_id               = var.image_id
+  instance_type          = var.instance_type
+  key_name               = var.key_name
   vpc_id                 = module.network.vpc_id
   vpc_cidr               = module.network.vpc_cidr
   public_subnet_ids      = module.network.public_subnet_ids
@@ -29,6 +33,8 @@ module "presentation" {
 module "business_logic" {
   source                   = "./modules/business_logic"
   image_id                 = var.image_id
+  instance_type            = var.instance_type
+  key_name                 = var.key_name
   vpc_id                   = module.network.vpc_id
   public_subnet_ids        = module.network.public_subnet_ids
   private_subnets_ids      = module.network.private_subnets_ids
@@ -45,4 +51,14 @@ module "database" {
   private_subnets_ids = module.network.private_subnets_ids
   DocumentDB_sg_id    = module.security_groups.DocumentDB_sg_id
   depends_on          = [module.network]
+}
+
+module "monitoring" {
+  source            = "./modules/monitoring"
+  image_id          = var.image_id
+  key_name          = var.key_name
+  instance_type     = var.instance_type
+  public_subnet_ids = module.network.public_subnet_ids
+  Monitoring_sg_id  = module.security_groups.Monitoring_sg_id
+  depends_on        = [module.presentation]
 }
