@@ -25,6 +25,20 @@ resource "aws_lb_listener" "http_listener" {
   }
 }
 
+# resource "aws_lb_listener" "https_listener" {
+#   load_balancer_arn = aws_lb.presentation_alb.arn
+#   port              = 443
+#   protocol          = "HTTPS"
+
+#   ssl_policy      = "ELBSecurityPolicy-2016-08"
+#   certificate_arn = var.acm_certificate_arn # <- Must be from eu-west-1
+
+#   default_action {
+#     type             = "forward"
+#     target_group_arn = aws_lb_target_group.presentation_target_group.arn
+#   }
+# }
+
 ####################################### ALB Target Group #######################################
 # Create a Target Group for the ALB to route traffic
 resource "aws_lb_target_group" "presentation_target_group" {
@@ -66,13 +80,13 @@ resource "aws_launch_template" "presentation_launch_template" {
 # Auto Scaling Group for the Web App, using the launch template
 resource "aws_autoscaling_group" "presentation_asg" {
   name                = "presentation_asg"
-  desired_capacity    = 1 # Desired number of instances
+  desired_capacity    = 2 # Desired number of instances
   max_size            = 2 # Maximum number of instances
   min_size            = 1 # Minimum number of instances
   health_check_type   = "EC2"
   vpc_zone_identifier = var.public_subnet_ids                               # Use available AZs dynamically fetched 
   target_group_arns   = [aws_lb_target_group.presentation_target_group.arn] # Add the target group ARN
-  depends_on = [aws_lb.presentation_alb]
+  depends_on          = [aws_lb.presentation_alb]
   launch_template {
     id      = aws_launch_template.presentation_launch_template.id # Reference the launch template ID
     version = "$Latest"                                           # Use the latest version of the launch template

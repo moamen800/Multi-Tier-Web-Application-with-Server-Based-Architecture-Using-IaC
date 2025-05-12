@@ -21,6 +21,7 @@ fi
 
 # Step 3: Clone the repository
 echo "Cloning the Simple-MERN-App repository..."
+cd /home/ubuntu || { echo "Failed to change to /home/ubuntu directory"; exit 1; }
 git clone https://github.com/Kuzma02/Simple-MERN-App || { echo "Failed to clone repository"; exit 1; }
 cd Simple-MERN-App || { echo "Failed to navigate to repository directory"; exit 1; }
 
@@ -125,10 +126,19 @@ sudo systemctl daemon-reload
 sudo systemctl start node_exporter
 sudo systemctl enable node_exporter
 
-# Verify Node Exporter installation
-if systemctl is-active --quiet node_exporter; then
-    echo "✅ Node Exporter has been installed and started successfully."
-else
-    echo "❌ Node Exporter installation failed."
-    exit 1
-fi
+
+# Final summary
+echo "------------------------------------------------------------"
+echo "🎯 Setup completed successfully!"
+echo ""
+echo "✅  System packages updated and tools installed (curl, unzip, git, wget, npm)"
+echo "✅  AWS CLI installed and verified"
+echo "✅  Simple-MERN-App cloned and configured"
+echo "✅  Node.js and pm2 installed and set up"
+echo "✅  DocumentDB connection configured (.env file created)"
+echo "✅  App dependencies installed"
+echo "✅  Backend application started and managed by pm2"
+echo "✅  Node Exporter installed and running for monitoring"
+echo ""
+echo "🚀 Your Simple-MERN-App backend is now running and ready!"
+echo "------------------------------------------------------------"

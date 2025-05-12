@@ -2,7 +2,6 @@ aws-architecture_serverbased/
 ├── global_main.tf 
 ├── global_variables.tf
 ├── global_outputs.tf
-├── data-sources.tf
 ├── provider.tf
 ├── terraform.tfvars
 ├── modules/
@@ -24,6 +23,10 @@ aws-architecture_serverbased/
 │   │   ├── main.tf
 │   │   ├── variables.tf
 │   │   └── outputs.tf
+│   ├── monitoring/
+│   │   ├── main.tf
+│   │   ├── variables.tf
+│   │   └── install-PrometheusServer-Grafana.sh
 │   ├── security_groups/
 │   │   ├── main.tf
 │   │   ├── variables.tf
