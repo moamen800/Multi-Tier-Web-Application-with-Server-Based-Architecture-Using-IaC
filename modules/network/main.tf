@@ -14,7 +14,7 @@ resource "aws_vpc" "main" {
 # Create public subnets across availability zones
 resource "aws_subnet" "public" {
   for_each                = var.public_subnets # Create one subnet per AZ
-  vpc_id                  = aws_vpc.main.id     # Associate with the VPC
+  vpc_id                  = aws_vpc.main.id    # Associate with the VPC
   cidr_block              = each.value         # Assign IP range from the map
   map_public_ip_on_launch = true               # Assign public IP to instances
   availability_zone       = each.key           # Set AZ for each subnet
@@ -53,10 +53,10 @@ resource "aws_route_table_association" "public_subnet_assoc" {
 # Create private subnets across availability zones
 resource "aws_subnet" "private" {
   for_each                = var.private_subnets # Create one subnet per AZ
-  vpc_id                  = aws_vpc.main.id      # Associate with the VPC
-  cidr_block              = each.value           # Assign IP range from the map
+  vpc_id                  = aws_vpc.main.id     # Associate with the VPC
+  cidr_block              = each.value          # Assign IP range from the map
   map_public_ip_on_launch = false
-  availability_zone       = each.key             # Set AZ for the subnet
+  availability_zone       = each.key # Set AZ for the subnet
 
   tags = {
     Name      = "private_subnet_${each.key}" # Name tag with AZ
@@ -100,7 +100,7 @@ resource "aws_eip" "nat_gateway_eip" {
 
 # Create a NAT Gateway to enable internet access for private subnets
 resource "aws_nat_gateway" "main" {
-  allocation_id = aws_eip.nat_gateway_eip.id                 # Use the allocated EIP
+  allocation_id = aws_eip.nat_gateway_eip.id         # Use the allocated EIP
   subnet_id     = aws_subnet.public["eu-west-1a"].id # Attach to a public subnet (ensure correct AZ)
 
   tags = {
@@ -129,7 +129,7 @@ resource "aws_network_acl" "private_nacl" {
     rule_no    = 100
     action     = "allow"
     cidr_block = "0.0.0.0/0"
-    from_port  = 0             # Allow all TCP ports
+    from_port  = 0 # Allow all TCP ports
     to_port    = 65535
   }
 
@@ -139,7 +139,7 @@ resource "aws_network_acl" "private_nacl" {
     rule_no    = 200
     action     = "allow"
     cidr_block = "0.0.0.0/0"
-    from_port  = 0             # Allow all TCP ports
+    from_port  = 0 # Allow all TCP ports
     to_port    = 65535
   }
 
@@ -150,7 +150,7 @@ resource "aws_network_acl" "private_nacl" {
 
 # Associate the private NACL with each private subnet
 resource "aws_network_acl_association" "private_nacl_association" {
-  for_each   = aws_subnet.private
-  subnet_id  = each.value.id
+  for_each       = aws_subnet.private
+  subnet_id      = each.value.id
   network_acl_id = aws_network_acl.private_nacl.id
 }

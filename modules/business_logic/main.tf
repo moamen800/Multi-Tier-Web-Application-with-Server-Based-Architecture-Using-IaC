@@ -51,11 +51,11 @@ resource "aws_lb_target_group" "business_logic_target_group" {
 ####################################### Launch Template #######################################
 # Launch Template using the dynamically fetched image_id
 resource "aws_launch_template" "business_logic_launch_template" {
-  name_prefix            = "business-logic-launch-template"                 # Prefix for the launch template name
-  image_id               = var.image_id                                     # Use the dynamically fetched Amazon Linux 2 AMI ID
-  vpc_security_group_ids = [var.business_logic_sg_id]                       # Security group for instances launched from this template
-  instance_type          = var.instance_type                                # Instance type for the presentation business_logic (can be changed as needed)
-  key_name               = var.key_name                                     # Replace with your key pair name
+  name_prefix            = "business-logic-launch-template" # Prefix for the launch template name
+  image_id               = var.image_id                     # Use the dynamically fetched Amazon Linux 2 AMI ID
+  vpc_security_group_ids = [var.business_logic_sg_id]       # Security group for instances launched from this template
+  instance_type          = var.instance_type                # Instance type for the presentation business_logic (can be changed as needed)
+  key_name               = var.key_name                     # Replace with your key pair name
   user_data              = filebase64(("${path.module}/backend.sh"))
   iam_instance_profile {
     name = aws_iam_instance_profile.business_logic_instance_profile.name
@@ -66,13 +66,13 @@ resource "aws_launch_template" "business_logic_launch_template" {
 # Auto Scaling Group for the Web App, using the launch template
 resource "aws_autoscaling_group" "business_logic_asg" {
   name                = "business_logics_asg"
-  desired_capacity    = 1 # Desired number of instances
-  max_size            = 1 # Maximum number of instances
+  desired_capacity    = 2 # Desired number of instances
+  max_size            = 2 # Maximum number of instances
   min_size            = 1 # Minimum number of instances
   health_check_type   = "EC2"
-  vpc_zone_identifier = var.private_subnets_ids                                 # Use available AZs dynamically fetched
+  vpc_zone_identifier = var.private_subnets_ids                               # Use available AZs dynamically fetched
   target_group_arns   = [aws_lb_target_group.business_logic_target_group.arn] # Add the target group ARN
-  depends_on = [aws_lb.business_logic_alb]
+  depends_on          = [aws_lb.business_logic_alb]
   launch_template {
     id      = aws_launch_template.business_logic_launch_template.id # Reference the launch template ID
     version = "$Latest"                                             # Use the latest version of the launch template

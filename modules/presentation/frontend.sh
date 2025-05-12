@@ -20,6 +20,7 @@ fi
 
 # Step 3: Clone the MERN application repository
 echo "Cloning the Simple-MERN-App repository..."
+cd /home/ubuntu || { echo "Failed to navigate to home directory"; exit 1; }
 git clone https://github.com/Kuzma02/Simple-MERN-App || { echo "Failed to clone repository"; exit 1; }
 cd Simple-MERN-App || { echo "Failed to navigate to repository directory"; exit 1; }
 
@@ -116,4 +117,17 @@ sudo systemctl daemon-reload
 sudo systemctl start node_exporter
 sudo systemctl enable node_exporter
 
-echo "✅ Node Exporter has been installed and started successfully."
+# Final detailed summary
+echo "------------------------------------------------------------"
+echo "🎯 Setup completed successfully!"
+echo ""
+echo "✅  System packages updated and tools installed (curl, unzip, npm, apache2)"
+echo "✅  AWS CLI installed and verified"
+echo "✅  Simple-MERN-App cloned from GitHub and configured"
+echo "✅  Backend API reconfigured to point to ALB DNS: $Business_logic_ALB_DNS"
+echo "✅  Frontend built and deployed via Apache2"
+echo "✅  Frontend accessible at: http://$Presentation_ALB_DNS"
+echo "✅  Node Exporter installed and running for monitoring"
+echo ""
+echo "🚀 Your MERN application is now fully deployed and live!"
+echo "------------------------------------------------------------"

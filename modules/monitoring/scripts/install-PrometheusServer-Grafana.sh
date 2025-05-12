@@ -18,31 +18,59 @@ sudo chown -R prometheus:prometheus /etc/prometheus
 sudo tee /etc/prometheus/rules.yml > /dev/null <<EOF
 ---
 groups:
-
   - name: Node_exporters
     rules:
+      - record: Status_Nodes_Exporters
+        expr: up{job="EC2_discover"}
+        labels:
+          node: "node_exporter"
 
-    - record: Status_Nodes_Exporters
-      expr: up{job="EC2_discover"}
-      labels:
-        node: "node_exporter"
-
-    - alert: NodeDown
-      expr: Status_Nodes_Exporters == 0
-      labels:
-        node: "NodeDown"
-      for: 0s
-
+      - alert: NodeDown
+        expr: Status_Nodes_Exporters == 0
+        for: 0s
+        labels:
+          node: "NodeDown"
+        annotations:
+          summary: "🚨 Node is down"
+          description: "Node exporter is not responding."
+          
   - name: CPU_Alerts
     rules:
-    
-    - alert: HighCpuLoad
-      expr: 100 - (avg by(instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 40
-      labels:
-        node: "HighCPU"
-      annotations:
-        summary: "High CPU load detected on {{ \$labels.instance }}"
-        description: "CPU load is over 40% (current value: {{ \$value }}%)."
+      - alert: LowCpuLoad
+        expr: 100 - (avg by(instance) (irate(node_cpu_seconds_total{mode="idle"}[1m])) * 100) > 20
+        for: 1m
+        labels:
+          severity: low
+          category: cpu
+        annotations:
+          summary: "🟢 Low CPU load on {{ index .Labels \"instance\" }}"
+          description: |
+            CPU load is above 20% for 1 minute on {{ index .Labels "instance" }}
+            (current value: {{ printf "%.2f" .Value }}%).
+
+      - alert: MediumCpuLoad
+        expr: 100 - (avg by(instance) (irate(node_cpu_seconds_total{mode="idle"}[1m])) * 100) > 40
+        for: 1m
+        labels:
+          severity: medium
+          category: cpu
+        annotations:
+          summary: "🟡 Medium CPU load on {{ index .Labels \"instance\" }}"
+          description: |
+            CPU load is above 40% for 1 minute on {{ index .Labels "instance" }}
+            (current value: {{ printf "%.2f" .Value }}%).
+
+      - alert: HighCpuLoad
+        expr: 100 - (avg by(instance) (irate(node_cpu_seconds_total{mode="idle"}[1m])) * 100) > 70
+        for: 1m
+        labels:
+          severity: high
+          category: cpu
+        annotations:
+          summary: "🔴 High CPU load on {{ index .Labels \"instance\" }}"
+          description: |
+            CPU load is above 70% for 1 minute on {{ index .Labels "instance" }}
+            (current value: {{ printf "%.2f" .Value }}%).
 EOF
 
 sudo chown prometheus:prometheus /etc/prometheus/rules.yml
@@ -52,12 +80,12 @@ sudo tee /etc/prometheus/prometheus.yml > /dev/null <<EOF
 ---
 global:
   scrape_interval: 15s
+  evaluation_interval: 15s
 
 alerting:
   alertmanagers:
     - static_configs:
-        - targets:
-          - localhost:9093
+        - targets: ["localhost:9093"]
 
 rule_files:
   - "rules.yml"
@@ -66,7 +94,7 @@ scrape_configs:
   - job_name: "localhost_node_exporter"
     static_configs:
       - targets: ["localhost:9100"]
-      
+
   - job_name: "EC2_discover"
     ec2_sd_configs:
       - region: "eu-west-1"
@@ -140,6 +168,8 @@ sudo mv alertmanager-0.24.0.linux-amd64/{alertmanager,amtool} /usr/local/bin/
 sudo chown alertmanager:alertmanager /usr/local/bin/{alertmanager,amtool}
 
 sudo mkdir -p /etc/alertmanager
+# Inside alertmanager.yml (edited)
+
 sudo tee /etc/alertmanager/alertmanager.yml > /dev/null <<EOF
 ---
 global:
@@ -149,41 +179,75 @@ route:
   receiver: 'default'
   group_wait: 10s
   group_interval: 15s
+  repeat_interval: 1h
   routes:
-    - match:
-        node: 'HighCPU'
-      receiver: 'HighCPU'
     - match:
         node: 'NodeDown'
       receiver: 'NodeDown'
+
+    - match:
+        severity: 'low'
+        category: 'cpu'
+      receiver: 'LowCpuSeverity'
+
+    - match:
+        severity: 'medium'
+        category: 'cpu'
+      receiver: 'MediumCpuSeverity'
+
+    - match:
+        severity: 'high'
+        category: 'cpu'
+      receiver: 'HighCpuSeverity'
 
 receivers:
   - name: 'default'
     slack_configs:
       - channel: "#default"
         send_resolved: true
-        api_url: 'https://hooks.slack.com/services/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'
+        api_url: '<SLACK_WEBHOOK_URL_DEFAULT>' # 🔒 Add your default Slack webhook URL here
 
-  - name: 'HighCPU'
-    slack_configs:
-      - channel: "#highcpu-app"
-        send_resolved: true
-        api_url: 'https://hooks.slack.com/services/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'
-  
   - name: 'NodeDown'
     slack_configs:
       - channel: "#nodedown-app"
         send_resolved: true
-        api_url: 'https://hooks.slack.com/services/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'
+        api_url: '<SLACK_WEBHOOK_URL_NODEDOWN>' # 🔒 Add Slack webhook for NodeDown alerts here
     email_configs:
-      - to: moamenahmed800@gmail.com
-        from: moamenahmed800@gmail.com
+      - to: '<YOUR_EMAIL@example.com>'
+        from: '<YOUR_EMAIL@example.com>'
         smarthost: smtp.gmail.com:587
-        auth_username: moamenahmed800@gmail.com
-        auth_identity: moamenahmed800@gmail.com
-        auth_password: wzsj rlst vtsf ggse
+        auth_username: '<YOUR_EMAIL@example.com>'
+        auth_identity: '<YOUR_EMAIL@example.com>'
+        auth_password: '<EMAIL_APP_PASSWORD>' # 🔒 Use an App Password, not your real password
+        send_resolved: true
+
+  - name: 'LowCpuSeverity'
+    slack_configs:
+      - channel: "#cpu-app"
+        send_resolved: true
+        api_url: '<SLACK_WEBHOOK_URL_CPU>' # 🔒 Add Slack webhook for low severity CPU alerts
+
+  - name: 'MediumCpuSeverity'
+    slack_configs:
+      - channel: "#cpu-app"
+        send_resolved: true
+        api_url: '<SLACK_WEBHOOK_URL_CPU>' # 🔒 Reuse or update webhook as needed
+
+  - name: 'HighCpuSeverity'
+    slack_configs:
+      - channel: "#cpu-app"
+        send_resolved: true
+        api_url: '<SLACK_WEBHOOK_URL_CPU>' # 🔒 Reuse or update webhook as needed
+    email_configs:
+      - to: '<YOUR_EMAIL@example.com>'
+        from: '<YOUR_EMAIL@example.com>'
+        smarthost: smtp.gmail.com:587
+        auth_username: '<YOUR_EMAIL@example.com>'
+        auth_identity: '<YOUR_EMAIL@example.com>'
+        auth_password: '<EMAIL_APP_PASSWORD>' # 🔒 Use a Gmail App Password here
         send_resolved: true
 EOF
+
 
 sudo chown -R alertmanager:alertmanager /etc/alertmanager
 
@@ -225,4 +289,18 @@ sudo systemctl restart prometheus.service
 sudo systemctl restart alertmanager.service
 sudo systemctl restart grafana-server.service
 
-echo "✅ Prometheus, Node Exporter, Alertmanager, and Grafana have been installed and configured successfully!"
+echo "------------------------------------------------------------"
+echo "🎯 Monitoring stack setup completed successfully!"
+echo ""
+echo "✅  Prometheus downloaded, configured, and started as a service"
+echo "✅  Prometheus rules (NodeDown, CPU alerts) created and applied"
+echo "✅  Prometheus is scraping EC2 Node Exporters and localhost"
+echo "✅  Node Exporter installed and exposed metrics at port 9100"
+echo "✅  Alertmanager installed with Slack and email alert routes"
+echo "✅  Systemd services for Prometheus, Node Exporter, and Alertmanager are running"
+echo "✅  Grafana repository added and latest version installed"
+echo "✅  Grafana server started and enabled to run on boot"
+echo ""
+echo "🚀 Your full Prometheus + Alertmanager + Grafana stack is live!"
+echo "------------------------------------------------------------"
+

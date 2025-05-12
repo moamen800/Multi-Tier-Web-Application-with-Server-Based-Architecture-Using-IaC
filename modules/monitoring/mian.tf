@@ -12,11 +12,11 @@ resource "aws_instance" "monitoring" {
 
   root_block_device {
     volume_size = 10
-    volume_type = "gp2" 
+    volume_type = "gp2"
   }
 
   tags = {
-    Name  = "Prometheus-Grafana Server"
+    Name = "Prometheus-Grafana Server"
   }
 }
 
@@ -54,6 +54,10 @@ resource "aws_iam_role_policy_attachment" "prometheus_cloudwatch_readonly_attach
   role       = aws_iam_role.prometheus_readonly_role.name
 }
 
+resource "aws_iam_role_policy_attachment" "prometheus_logs_readonly_attachment" {
+  policy_arn = "arn:aws:iam::aws:policy/CloudWatchLogsReadOnlyAccess"
+  role       = aws_iam_role.prometheus_readonly_role.name
+}
 
 # ------------------------------------------
 # IAM Instance Profile for Prometheus Server
