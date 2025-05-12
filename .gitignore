@@ -25,8 +25,4 @@ keypair.pem
 # File containing various commands used for your Terraform project or server setup.
 commands.sh
 FolderStructure_ serverbased.txt
-
-modules/monitoring/prometheus_files 
-
-# local secrets
-.env
+modules/monitoring/prometheus_files
