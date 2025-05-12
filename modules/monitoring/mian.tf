@@ -7,7 +7,7 @@ resource "aws_instance" "monitoring" {
   key_name               = var.key_name
   subnet_id              = var.public_subnet_ids[0]
   vpc_security_group_ids = [var.Monitoring_sg_id]
-  user_data              = file("${path.module}/scripts/install-PrometheusServer-Grafana.sh")
+  user_data              = file("${path.module}/install-Prometheus-and-Grafana-Server.sh")
   iam_instance_profile   = aws_iam_instance_profile.prometheus_instance_profile.name
 
   root_block_device {

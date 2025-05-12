@@ -21,12 +21,7 @@ FolderStructure_serverbased.txt
 # PEM file for your key pair, used for SSH or other secure connections.
 keypair.pem
 
-# Commands
-# File containing various commands used for your Terraform project or server setup.
+# === Project Notes & Configuration Files ===
 commands.sh
-FolderStructure_ serverbased.txt
-
-modules/monitoring/prometheus_files 
-
-# local secrets
-.env
+FolderStructure_serverbased.txt
+modules/monitoring/prometheus_files/
