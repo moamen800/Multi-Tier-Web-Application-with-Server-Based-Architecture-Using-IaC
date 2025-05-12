@@ -1,0 +1,54 @@
+groups:
+  - name: Node_exporters
+    rules:
+      - record: Status_Nodes_Exporters
+        expr: up{job="EC2_discover"}
+        labels:
+          node: "node_exporter"
+
+      - alert: NodeDown
+        expr: Status_Nodes_Exporters == 0
+        for: 0s
+        labels:
+          node: "NodeDown"
+        annotations:
+          summary: "🚨 Node is down"
+          description: "Node exporter is not responding."
+          
+  - name: CPU_Alerts
+    rules:
+      - alert: LowCpuLoad
+        expr: 100 - (avg by(instance) (irate(node_cpu_seconds_total{mode="idle"}[1m])) * 100) > 20
+        for: 1m
+        labels:
+          severity: low
+          category: cpu
+        annotations:
+          summary: "🟢 Low CPU load on {{ index .Labels \"instance\" }}"
+          description: |
+            CPU load is above 20% for 1 minute on {{ index .Labels "instance" }}
+            (current value: {{ printf "%.2f" .Value }}%).
+
+      - alert: MediumCpuLoad
+        expr: 100 - (avg by(instance) (irate(node_cpu_seconds_total{mode="idle"}[1m])) * 100) > 40
+        for: 1m
+        labels:
+          severity: medium
+          category: cpu
+        annotations:
+          summary: "🟡 Medium CPU load on {{ index .Labels \"instance\" }}"
+          description: |
+            CPU load is above 40% for 1 minute on {{ index .Labels "instance" }}
+            (current value: {{ printf "%.2f" .Value }}%).
+
+      - alert: HighCpuLoad
+        expr: 100 - (avg by(instance) (irate(node_cpu_seconds_total{mode="idle"}[1m])) * 100) > 70
+        for: 1m
+        labels:
+          severity: high
+          category: cpu
+        annotations:
+          summary: "🔴 High CPU load on {{ index .Labels \"instance\" }}"
+          description: |
+            CPU load is above 70% for 1 minute on {{ index .Labels "instance" }}
+            (current value: {{ printf "%.2f" .Value }}%).

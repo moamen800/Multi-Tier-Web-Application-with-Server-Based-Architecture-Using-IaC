@@ -1,0 +1,74 @@
+global:
+  resolve_timeout: 15s
+
+route:
+  receiver: 'default'
+  group_wait: 10s
+  group_interval: 15s
+  repeat_interval: 1h
+  routes:
+    - match:
+        node: 'NodeDown'
+      receiver: 'NodeDown'
+
+    - match:
+        severity: 'low'
+        category: 'cpu'
+      receiver: 'LowCpuSeverity'
+
+    - match:
+        severity: 'medium'
+        category: 'cpu'
+      receiver: 'MediumCpuSeverity'
+
+    - match:
+        severity: 'high'
+        category: 'cpu'
+      receiver: 'HighCpuSeverity'
+
+receivers:
+  - name: 'default'
+    slack_configs:
+      - channel: "#default"
+        send_resolved: true
+        api_url: 'https://hooks.slack.com/services/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'
+
+  - name: 'NodeDown'
+    slack_configs:
+      - channel: "#nodedown-app"
+        send_resolved: true
+        api_url: 'https://hooks.slack.com/services/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'
+    email_configs:
+      - to: moamenahmed800@gmail.com
+        from: moamenahmed800@gmail.com
+        smarthost: smtp.gmail.com:587
+        auth_username: moamenahmed800@gmail.com
+        auth_identity: moamenahmed800@gmail.com
+        auth_password: wzsj rlst vtsf ggse
+        send_resolved: true
+
+  - name: 'LowCpuSeverity'
+    slack_configs:
+      - channel: "#cpu-app"
+        send_resolved: true
+        api_url: 'https://hooks.slack.com/services/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'
+
+  - name: 'MediumCpuSeverity'
+    slack_configs:
+      - channel: "#cpu-app"
+        send_resolved: true
+        api_url: 'https://hooks.slack.com/services/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'
+
+  - name: 'HighCpuSeverity'
+    slack_configs:
+      - channel: "#cpu-app"
+        send_resolved: true
+        api_url: 'https://hooks.slack.com/services/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'
+    email_configs:
+      - to: moamenahmed800@gmail.com
+        from: moamenahmed800@gmail.com
+        smarthost: smtp.gmail.com:587
+        auth_username: moamenahmed800@gmail.com
+        auth_identity: moamenahmed800@gmail.com
+        auth_password: wzsj rlst vtsf ggse
+        send_resolved: true

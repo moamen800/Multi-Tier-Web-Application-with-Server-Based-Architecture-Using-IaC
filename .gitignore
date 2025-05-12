@@ -25,3 +25,4 @@ keypair.pem
 commands.sh
 FolderStructure_serverbased.txt
 modules/monitoring/prometheus_files/
+.DS_Store
