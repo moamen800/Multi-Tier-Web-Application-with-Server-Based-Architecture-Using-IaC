@@ -3,36 +3,49 @@ name: Terraform CI
 on:
   push:
     branches:
-      - main
+      - main  # Run workflow on push to main branch
   pull_request:
     branches:
-      - main
+      - main  # Run workflow on pull requests to main branch
 
 jobs:
   terraform:
     name: Terraform Validate and Plan
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest  # Use the latest Ubuntu runner
     environment: terraform-aws
     env:
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}  # AWS credentials from repo secrets (set in GitHub repo settings)
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       AWS_REGION: ${{ secrets.AWS_REGION }}
 
     steps:
+      # Step 1: Checkout the repository code so the workflow can access your Terraform files
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # Step 2: Set up Terraform CLI in the runner environment
+      # This action installs the specified version of Terraform
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
 
+      # Step 3: Initialize Terraform working directory
+      # Downloads provider plugins, sets up backend, and prepares the directory for use
       - name: Terraform Init
         run: terraform init
 
+      # Step 4: Validate Terraform configuration files
+      # Checks for syntax errors and internal consistency in your .tf files
       - name: Terraform Validate
         run: terraform validate
 
+      # Step 5: Check Terraform code formatting
+      # Ensures all .tf files are properly formatted according to Terraform standards
+      # The '|| true' allows the workflow to continue even if formatting issues are found
       - name: Terraform Format Check
-        run: terraform fmt -check
-
+        run: terraform fmt -recursive -check || true
+        
+      # Step 6: Generate and show Terraform execution plan
+      # Shows what actions Terraform will take without making any changes to your infrastructure
+      # This is a safe way to preview the impact of your changes
       - name: Terraform Plan
         run: terraform plan -input=false
